@@ -16,4 +16,13 @@ function requireRoles(...roles: string[]) {
 	};
 }
 
+function requireSocketIORoles(...roles: string[]) {
+	return (socket, next) => {
+		if (!roles.includes(socket.user.role)) {
+			return next(new Error('Authentication error'));
+		}
+		next();
+	};
+}
+
 export default requireRoles;

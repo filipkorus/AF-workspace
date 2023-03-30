@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
@@ -8,8 +9,16 @@ import trimmer from './middleware/trimmer';
 import {emailToLowerCase} from './middleware/emailToLowerCase';
 import router from './routes/main.router';
 import requestLogger from './middleware/requestLogger';
+import {requireSocketIOAuth} from "./middleware/requireAuth";
+import {logInfo} from "./utils/logger";
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = require('socket.io')(httpServer, {
+	cors: {
+		origin: config.get<string[]>('ORIGIN')
+	}
+});
 
 app.use(cors({
 	origin: config.get<string[]>('ORIGIN'),
@@ -31,8 +40,23 @@ app.use(emailToLowerCase);
 
 app.use('/api', router);
 
+io.use(requireSocketIOAuth);
+io.on('connection', socket => {
+	logInfo(`New socket connected: ${socket.id}`);
+
+	socket.on('disconnect', () => logInfo(`Socket disconnected: ${socket.id}`));
+
+	socket.emit('greeting-from-server', {
+		msg: 'Hello Client'
+	});
+	socket.on('msg', message => {
+		logInfo(`New socket msg: ${message}`);
+	});
+});
+
 /* SERVE STATIC FILES (FRONTEND) */
 // app.use('/', express.static(config.get<string>("STATIC_FILES_DIR")));
 // app.get('*', (req, res) => res.sendFile(path.resolve(config.get<string>("STATIC_FILES_DIR"), 'index.html')))
 
-export default app;
+// export default app;
+export default httpServer;

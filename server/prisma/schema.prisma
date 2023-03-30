@@ -13,6 +13,7 @@ model User {
 	name							String
 	picture						String	 @db.VarChar(255)
 	role              String   @db.VarChar(20)
+	admin            	Boolean  @default(false)
 	banned            Boolean  @default(false)
 	joinedAt          DateTime @default(now())
 	tokens            RefreshToken[]

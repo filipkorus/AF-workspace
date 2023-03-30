@@ -1,11 +1,14 @@
-import {useContext, useEffect, useState} from "react";
-import AuthContext from "../utils/auth/AuthContext";
+import {useEffect, useState} from "react";
+import {useAuth} from "../contexts/AuthContext";
+import {Navigate, useNavigate} from "react-router-dom";
+import {Alert, Box, Container, Grid, LinearProgress} from '@mui/material';
 
 const Login = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 
-	const {googleAuthLogin} : any = useContext(AuthContext);
+	const { login, currentUser } : any = useAuth();
+	const navigate = useNavigate();
 
 	const google = (window as any).google || null; /* global google */
 	const params = new URLSearchParams(window.location.search);
@@ -20,34 +23,60 @@ const Login = () => {
 			type: 'standard', // standard, icon
 			theme: 'outline', // outline, filled_blue, filled_black
 			size: 'large', // large, medium, small
-			text: 'signin', // signin_with, signup_with, continue_with, signin
+			text: 'continue_with', // signin_with, signup_with, continue_with, signin
 			shape: 'pill', // rectangular, pill, circle, square,
 			// click_listener: () => console.log('clicked google')
 		});
+
+		const btn = document.getElementById("signInWithGoogleDiv");
+		if (btn) {
+			btn.style.width = '100%';
+		}
+
 
 		// google.accounts.id.prompt();
 
 		google.accounts.id.initialize({
 			client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
 			auto_select: !loggedOut,
-			callback: (response : any) => googleAuthLogin({setLoading, setError, response })
+			// callback: (response : any) => googleAuthLogin({setLoading, setError, response })
+			callback: async (response: any) => {
+				setError('');
+				setLoading(true);
+				await login({setError, response});
+				navigate('/');
+			}
 		});
 	}, []); // runs onMount
 
-	return <>
-		<main
-			style={{
-				display: "flex",
-				justifyContent: "center",
-				flexDirection: "column",
-				alignItems: "center",
-			}}
-		>
-			{error && <p style={{ color: "red" }}>{error}</p>}
-			{loading ? <div>Loading...</div> : <div id="signInWithGoogleDiv"></div>}
-			{loggedOut && <p>Logged out successfully</p>}
-		</main>
-	</>;
+	return currentUser ?
+		<Navigate to="/" /> :
+		<Container>
+			<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '100vh' }}
+			>
+
+				<Grid item xs={3}>
+					<Box
+						sx={{
+							backgroundColor: 'primary.dark',
+						}}
+					>
+						{error && <Alert severity="error">{error}</Alert>}
+						{loading ?
+							<Box><LinearProgress /></Box> :
+							<div id="signInWithGoogleDiv"></div>}
+						{loggedOut && <p>Logged out successfully</p>}
+					</Box>
+				</Grid>
+
+			</Grid>
+		</Container>
 };
 
 export default Login;
