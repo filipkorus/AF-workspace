@@ -42,16 +42,15 @@ app.use('/api', router);
 
 io.use(requireSocketIOAuth);
 io.on('connection', socket => {
-	logInfo(`New socket connected: ${socket.id}`);
-
-	socket.on('disconnect', () => logInfo(`Socket disconnected: ${socket.id}`));
+	logInfo(`${socket.user.name} (socket.id=${socket.id}) connected to socket server`);
 
 	socket.emit('greeting-from-server', {
 		msg: 'Hello Client'
 	});
-	socket.on('msg', message => {
-		logInfo(`New socket msg: ${message}`);
-	});
+
+	socket.on('disconnect', () => logInfo(`${socket.user.name} (socket.id=${socket.id}) disconnected from socket server`));
+
+	socket.on('msg', message => logInfo(`${socket.user.name} (socket.id=${socket.id}) sent message: ${message}`));
 });
 
 /* SERVE STATIC FILES (FRONTEND) */

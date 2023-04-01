@@ -12,7 +12,12 @@ const Login = () => {
 
 	const google = (window as any).google || null; /* global google */
 	const params = new URLSearchParams(window.location.search);
-	const loggedOut = params.get('loggedOut') === 'true';
+	const isLoggedOut = params.get('loggedOut') === 'true';
+	const isKickedOut = params.get('kickedOut') === 'true';
+
+
+	// const routes = navigation.getState()?.routes;
+	// const prevRoute = routes[routes.length - 2];
 
 	useEffect(() => {
 		if (!google) {
@@ -38,7 +43,7 @@ const Login = () => {
 
 		google.accounts.id.initialize({
 			client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-			auto_select: !loggedOut,
+			auto_select: !isLoggedOut,
 			// callback: (response : any) => googleAuthLogin({setLoading, setError, response })
 			callback: async (response: any) => {
 				setError('');
@@ -52,6 +57,7 @@ const Login = () => {
 	return currentUser ?
 		<Navigate to="/" /> :
 		<Container>
+			{loading && <LinearProgress />}
 			<Grid
 				container
 				spacing={0}
@@ -68,10 +74,9 @@ const Login = () => {
 						}}
 					>
 						{error && <Alert severity="error">{error}</Alert>}
-						{loading ?
-							<Box><LinearProgress /></Box> :
-							<div id="signInWithGoogleDiv"></div>}
-						{loggedOut && <p>Logged out successfully</p>}
+						{!loading && <div id="signInWithGoogleDiv"></div>}
+						{isLoggedOut && <Alert severity="success">Logged out successfully</Alert>}
+						{isKickedOut && <Alert severity="warning">Please log in first</Alert>}
 					</Box>
 				</Grid>
 
