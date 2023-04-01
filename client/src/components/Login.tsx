@@ -15,10 +15,6 @@ const Login = () => {
 	const isLoggedOut = params.get('loggedOut') === 'true';
 	const isKickedOut = params.get('kickedOut') === 'true';
 
-
-	// const routes = navigation.getState()?.routes;
-	// const prevRoute = routes[routes.length - 2];
-
 	useEffect(() => {
 		if (!google) {
 			return;
@@ -38,13 +34,11 @@ const Login = () => {
 			btn.style.width = '100%';
 		}
 
-
 		// google.accounts.id.prompt();
 
 		google.accounts.id.initialize({
 			client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
 			auto_select: !isLoggedOut,
-			// callback: (response : any) => googleAuthLogin({setLoading, setError, response })
 			callback: async (response: any) => {
 				setError('');
 				setLoading(true);
@@ -76,7 +70,7 @@ const Login = () => {
 						{error && <Alert severity="error">{error}</Alert>}
 						{!loading && <div id="signInWithGoogleDiv"></div>}
 						{isLoggedOut && <Alert severity="success">Logged out successfully</Alert>}
-						{isKickedOut && <Alert severity="warning">Please log in first</Alert>}
+						{isKickedOut && <Alert severity="warning">Please log in</Alert>}
 					</Box>
 				</Grid>
 
