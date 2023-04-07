@@ -5,7 +5,7 @@ import theme from '../../utils/theme';
 const LeftSide = () => {
 	return <Grid item xs={2} style={{
 		backgroundColor: theme.palette.primary.main,
-		height: '100%',
+		height: '98%',
 		margin: '0.5%',
 		justifyContent: 'center',
 		alignItems: 'center'
