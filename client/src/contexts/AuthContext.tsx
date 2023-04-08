@@ -8,46 +8,50 @@ export function useAuth() {
 	return useContext(AuthContext);
 }
 
-export function AuthProvider({ children } : {children : JSX.Element}) {
+export function AuthProvider({children}: { children: JSX.Element }) {
 	const [currentUser, setCurrentUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const firstUserRequest = useRef<boolean>(true);
 
-	const login = async (credential : string) => {
+	const login = async (credential: string): Promise<{success: string|null, error: string|null}> => {
 		try {
-			const {data} = await api.post('/user/auth/login', {credential}, {withCredentials:true});
+			const {data} = await api.post('/user/auth/login', {credential}, {withCredentials: true});
 
 			setCurrentUser(data?.user as User);
 			api.defaults.headers.common['Authorization'] = `Bearer ${data?.token}`;
 			setLoading(false);
 			return {
-				success: data?.msg || true,
+				success: data?.msg || 'Logged in successfully',
 				error: null
 			};
 		} catch (error) {
 			setLoading(false);
 			return {
 				success: null,
-				error: (error as any)?.response?.data?.msg
+				error: (error as any)?.response?.data?.msg || 'error'
 			};
 		}
 	};
 
-	const logout = async () => {
+	const logout = async (): Promise<{success: string|null, error: string|null}> => {
 		try {
 			const {status, data} = await api.get('/user/auth/logout', {withCredentials: true});
 			if (status === 200) {
 				setCurrentUser(null);
 				api.defaults.headers.common['Authorization'] = '';
 				return {
-					success: data.msg,
+					success: data?.msg as string || 'Logged out successfully',
 					error: null
 				};
 			}
+			return {
+				success: null,
+				error:  data?.msg as string || 'error'
+			};
 		} catch (error) {
 			return {
 				success: null,
-				error: (error as any)?.response?.data?.msg
+				error: (error as any)?.response?.data?.msg as string || 'error'
 			};
 		}
 	}
