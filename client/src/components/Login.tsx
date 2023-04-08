@@ -27,7 +27,7 @@ const Login = () => {
 			theme: 'outline', // outline, filled_blue, filled_black
 			size: 'large', // large, medium, small
 			text: 'continue_with', // signin_with, signup_with, continue_with, signin
-			shape: 'pill', // rectangular, pill, circle, square,
+			shape: 'rectangular', // rectangular, pill, circle, square,
 			// click_listener: () => console.log('clicked google')
 		});
 
@@ -66,7 +66,7 @@ const Login = () => {
 			}}
 			>
 				{loading &&
-                <LinearProgress color="primary" sx={{position: 'absolute', top: 0, left: 0, width: '100vw'}}/>}
+                <LinearProgress color="secondary" sx={{position: 'absolute', top: 0, left: 0, width: '100vw'}}/>}
 
 				<Grid
 					container

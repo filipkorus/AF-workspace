@@ -13,7 +13,7 @@ const RightSide = () => {
 		<Box style={{
 			backgroundColor: theme.palette.secondary.main,
 			height: '99%',
-			width: '95%',
+			width: '96%',
 			padding: '0.5%'
 		}}
 		>
