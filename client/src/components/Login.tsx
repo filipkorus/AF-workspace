@@ -9,7 +9,7 @@ const Login = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 
-	const {login, currentUser}: any = useAuth();
+	const {login, currentUser} : any = useAuth();
 	const navigate = useNavigate();
 
 	const google = (window as any).google || null; /* global google */
@@ -27,7 +27,7 @@ const Login = () => {
 			theme: 'outline', // outline, filled_blue, filled_black
 			size: 'large', // large, medium, small
 			text: 'continue_with', // signin_with, signup_with, continue_with, signin
-			shape: 'pill', // rectangular, pill, circle, square,
+			shape: 'rectangular', // rectangular, pill, circle, square,
 			// click_listener: () => console.log('clicked google')
 		});
 
