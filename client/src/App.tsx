@@ -4,7 +4,7 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
-import SignIn from './components/SignIn';
+
 import Workspace from './components/Workspace';
 
 const App = () => {
@@ -15,7 +15,6 @@ const App = () => {
 					<Route path="/" element={<Dashboard/>}/>
 					<Route path="/workspace/:id" element={<Workspace/>}/>
 				</Route>
-				<Route path="/signin" element={<SignIn />} /> {/* /signin to preview jak mozna zrobic strone logowania - nie ma zadnej funkcjonalnosci */}
 				<Route path="/login" element={<Login/>} />
 				<Route path="*" element={<div>404 Not Found</div>} />
 			</Routes>

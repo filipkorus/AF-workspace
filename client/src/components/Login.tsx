@@ -66,7 +66,7 @@ const Login = () => {
 			}}
 			>
 				{loading &&
-                <LinearProgress color="secondary" sx={{position: 'absolute', top: 0, left: 0, width: '100vw'}}/>}
+                <LinearProgress color="primary" sx={{position: 'absolute', top: 0, left: 0, width: '100vw'}}/>}
 
 				<Grid
 					container
