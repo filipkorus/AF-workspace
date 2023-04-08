@@ -6,15 +6,16 @@ import Center from './workspace/Center';
 import RightSide from './workspace/RightSide';
 import logo from '../assets/logo.png';
 import {useEffect, useRef, useState} from 'react';
-import {io} from 'socket.io-client';
+import {io, Socket} from 'socket.io-client';
 import api from '../api';
+import {User} from '../types';
 
 const Workspace = () => {
-	const {id} = useParams();
-	const {currentUser}: any = useAuth();
+	const {id} : any = useParams();
+	const {currentUser} : any = useAuth();
 
 	// socket.io related stuff
-	const socket = useRef(
+	const socket = useRef<Socket>(
 		io('http://localhost:5000', {
 			autoConnect: false,
 			auth: {
@@ -24,10 +25,10 @@ const Workspace = () => {
 		})
 	);
 
-	const [isConnected, setIsConnected] = useState(socket.current.connected);
-	const [reconnectAttempt, setReconnectAttempt] = useState(0);
-	const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState(false);
-	const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState(false);
+	const [isConnected, setIsConnected] = useState<boolean>(socket.current.connected);
+	const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
+	const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
+	const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
 	const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
 	useEffect(() => {

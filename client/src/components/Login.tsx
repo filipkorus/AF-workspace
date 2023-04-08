@@ -1,11 +1,12 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useAuth} from "../contexts/AuthContext";
 import {Navigate, useNavigate} from "react-router-dom";
 import {Alert, Box, Container, Grid, LinearProgress} from '@mui/material';
+import {User} from '../types';
 
 const Login = () => {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState("");
+	const [loading, setLoading] = useState<boolean>(false);
+	const [error, setError] = useState<string>("");
 
 	const { login, currentUser } : any = useAuth();
 	const navigate = useNavigate();
@@ -42,8 +43,12 @@ const Login = () => {
 			callback: async (response: any) => {
 				setError('');
 				setLoading(true);
-				await login({setError, response});
-				navigate('/');
+				const {success, error} = await login(response.credential);
+				if (success) {
+					return navigate('/');
+				}
+				setError(error);
+				setLoading(false);
 			}
 		});
 	}, []); // runs onMount
