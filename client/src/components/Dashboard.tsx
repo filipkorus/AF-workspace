@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, Link as RouterLink} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
-import {Alert, Avatar, Box, Button, Container, LinearProgress, Snackbar} from '@mui/material';
+import {Alert, Avatar, Box, Button, Container} from '@mui/material';
 
 const Dashboard = () => {
 	const [error, setError] = useState('');

@@ -9,7 +9,7 @@
 }
 .logo-animation {
     animation-name: logo-animation;
-    animation-duration: 3s;
+    animation-duration: 3.5s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     /*margin-top: 20px;*/

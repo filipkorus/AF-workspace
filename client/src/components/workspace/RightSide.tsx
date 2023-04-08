@@ -13,10 +13,11 @@ const RightSide = () => {
 		<Box style={{
 			backgroundColor: theme.palette.secondary.main,
 			height: '99%',
-			width: '95%',
+			width: '96%',
 			padding: '0.5%'
 		}}
 		>
+			WORKSPACE ID:{}
 			jak tu zrobic formatowanie kodu bo nie umiem <br/>
 			czat + kto edytuje ten shiet <br/>
 			czemu tu nie kupa dzialaja entery jednak dzialaja dzieki czat jednak nie dzialaja japierodleee a jednak
