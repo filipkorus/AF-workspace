@@ -19,7 +19,7 @@ const Center = () => {
 			alignContent: "center"
 		}}
 	>
-		{/*DISCLAIMER: wszystko to co tu dalem to po to zebys widziala*/}
+		{/*DISCLAIMER: wszystko to co tu dalem to po to zebys widziala oki*/}
 		{/*jak mozna wyswietlac dane aktualnie zalogowanego uzytkownika itp*/}
 		to jest workspace z id={id}
 		<br/><br/>{/* tagow br nie powinno sie wgl uzywac jak cos - ja uzylem roboczo */}
