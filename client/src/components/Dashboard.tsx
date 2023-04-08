@@ -13,11 +13,13 @@ const Dashboard = () => {
 	const handleLogout = async () => {
 		setError('');
 
-		if (await logout()) {
+		const {success, error} = await logout();
+
+		if (success) {
 			return navigate('/login?loggedOut=true');
 		}
 
-		setError('Failed to log out');
+		setError(error || 'Failed to log out');
 	}
 
 	return <Container maxWidth="lg">
