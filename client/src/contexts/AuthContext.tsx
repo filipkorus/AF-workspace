@@ -28,7 +28,7 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 			setLoading(false);
 			return {
 				success: null,
-				error: (error as any)?.response?.data?.msg || 'error'
+				error: (error as any)?.response?.data?.msg || 'Server connection error'
 			};
 		}
 	};
@@ -46,12 +46,12 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 			}
 			return {
 				success: null,
-				error:  data?.msg as string || 'error'
+				error:  data?.msg as string || 'Server error'
 			};
 		} catch (error) {
 			return {
 				success: null,
-				error: (error as any)?.response?.data?.msg as string || 'error'
+				error: (error as any)?.response?.data?.msg as string || 'Server connection error'
 			};
 		}
 	}
