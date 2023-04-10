@@ -1,29 +1,126 @@
 generator client {
-	provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-	provider = "mysql"
-	url      = env("DB_URL")
+  provider = "mysql"
+  url      = env("DB_URL")
 }
 
 model User {
-	id                Int      @id @default(autoincrement())
-	email             String   @unique
-	name							String
-	picture						String	 @db.VarChar(255)
-	role              String   @db.VarChar(20)
-	admin            	Boolean  @default(false)
-	banned            Boolean  @default(false)
-	joinedAt          DateTime @default(now())
-	tokens            RefreshToken[]
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  name             String
+  picture          String            @db.VarChar(255)
+  role             String            @db.VarChar(20)
+  admin            Boolean           @default(false)
+  banned           Boolean           @default(false)
+  joinedAt         DateTime          @default(now())
+  tokens           RefreshToken[]
+  workspaces       Workspace[]
+  messages         Message[]
+  workspaceMembers WorkspaceMember[] @relation("user")
+  workspaceSharers WorkspaceMember[] @relation("addedByUser")
+  sharedFiles      SharedFile[]
+  TODO             TODO[]
+  Poll             Poll[]
+  Vote             Vote[]
+  Task             Task[]
 }
 
 model RefreshToken {
-	id                Int      @id @default(autoincrement())
-	token             String   @unique @db.VarChar(150)
-	createdAt         DateTime @default(now())
-	expiresAt         DateTime
-	user              User     @relation(fields: [userId], references: [id])
-	userId            Int
+  id        Int      @id @default(autoincrement())
+  token     String   @unique @db.VarChar(150)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model Workspace {
+  id               Int               @id @default(autoincrement())
+  hashId           String            @unique
+  content          String
+  user             User              @relation(fields: [createdByUserId], references: [id])
+  createdByUserId  Int
+  createdAt        DateTime          @default(now())
+  Message          Message[]
+  WorkspaceMembers WorkspaceMember[]
+  SharedFile       SharedFile[]
+  TODO             TODO[]
+  Poll             Poll[]
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  content     String
+  createdAt   DateTime  @default(now())
+}
+
+model WorkspaceMember {
+  id          Int       @id @default(autoincrement())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+  user        User      @relation("user", fields: [userId], references: [id])
+  userId      Int
+  addedByUser User      @relation("addedByUser", fields: [addedBy], references: [id])
+  addedBy     Int
+  addedAt     DateTime  @default(now())
+}
+
+model SharedFile {
+  id               Int       @id @default(autoincrement())
+  workspace        Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId      Int
+  originalFilename String
+  uniqueFilename   String    @unique
+  user             User      @relation(fields: [addedBy], references: [id])
+  addedBy          Int
+  addedAt          DateTime  @default(now())
+}
+
+model TODO {
+  id          Int       @id @default(autoincrement())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+  user        User      @relation(fields: [addedBy], references: [id])
+  addedBy     Int
+  addedAt     DateTime  @default(now())
+  Task        Task[]
+}
+
+model Task {
+  id      Int      @id @default(autoincrement())
+  todo    TODO     @relation(fields: [todoId], references: [id])
+  todoId  Int
+  title   String
+  checked Boolean  @default(false)
+  user    User     @relation(fields: [addedBy], references: [id])
+  addedBy Int
+  addedAt DateTime @default(now())
+}
+
+model Poll {
+  id          Int       @id @default(autoincrement())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+  options     Json
+  user        User      @relation(fields: [createdBy], references: [id])
+  createdBy   Int
+  createdAt   DateTime  @default(now())
+  endAt       DateTime
+  Vote        Vote[]
+}
+
+model Vote {
+  id        Int      @id @default(autoincrement())
+  poll      Poll     @relation(fields: [pollId], references: [id])
+  pollId    Int
+  user      User     @relation(fields: [createdBy], references: [id])
+  createdBy Int
+  createdAt DateTime
 }
