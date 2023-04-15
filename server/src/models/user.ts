@@ -1,5 +1,4 @@
 import {model, Schema} from 'mongoose';
-import {IRefreshToken, refreshTokenSchema} from './refreshToken';
 import ROLE from '../utils/roles.util';
 
 export interface IUser {
@@ -11,7 +10,11 @@ export interface IUser {
 	admin: boolean,
 	banned: boolean,
 	joinedAt: Date,
-	refreshTokens?: IRefreshToken[]
+	refreshTokens?: {
+		token: string,
+		createdAt: Date,
+		expiresAt: Date
+	}[]
 }
 
 const userSchema = new Schema<IUser>({
@@ -43,7 +46,20 @@ const userSchema = new Schema<IUser>({
 		type: Date,
 		default: new Date()
 	},
-	refreshTokens: [refreshTokenSchema]
+	refreshTokens: [{
+		token: {
+			type: String,
+			required: true
+		},
+		createdAt: {
+			type: Date,
+			default: new Date()
+		},
+		expiresAt: {
+			type: Date,
+			required: true
+		}
+	}]
 });
 
 const User = model('user', userSchema);

@@ -5,7 +5,6 @@ import {logError} from "../../utils/logger";
 import {OAuth2Client, TokenPayload} from 'google-auth-library';
 import {HydratedDocument} from 'mongoose';
 import User, {IUser} from '../../models/user';
-import RefreshToken from '../../models/refreshToken';
 
 const GOOGLE_CLIENT_ID = config.get<string>("GOOGLE_CLIENT_ID");
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -102,10 +101,10 @@ export const generateRefreshToken = async (userId: string): Promise<string> => {
 			{_id: userId},
 			{
 				$push: {
-					refreshTokens: new RefreshToken({
+					refreshTokens: {
 						token: refreshToken,
 						expiresAt
-					})
+					}
 				}
 			}
 		)
@@ -150,7 +149,7 @@ export const deleteExpiredRefreshTokens = async (): Promise<void> => {
 	try {
 		await User.updateMany(
 			{},
-			{$pull: {refreshTokens: {token: {"$lt": new Date()}}}}
+			{$pull: {refreshTokens: {expiresAt: {"$lt": new Date()}}}}
 		)
 	} catch (error) {}
 };
