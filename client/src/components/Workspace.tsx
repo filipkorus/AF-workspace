@@ -32,6 +32,10 @@ const Workspace = () => {
 	const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
 	useEffect(() => {
+		(socket.current.auth as any).token = (api.defaults.headers.common['Authorization'] as string)?.split(' ')[1];
+	}, [api.defaults.headers.common['Authorization']]);
+
+	useEffect(() => {
 		socket.current.connect();
 
 		const onConnect = () => {
@@ -48,7 +52,7 @@ const Workspace = () => {
 		const onConnectError = (error: Error) => {
 			console.log(`connect_error due to ${error.message}`);
 			if (error.message === 'Authentication error') {
-				window.location.reload();
+				// window.location.reload();
 			}
 		}
 		const onReconnect = (attempt: number) => {
@@ -66,7 +70,7 @@ const Workspace = () => {
 		const onReconnectError = (error: Error) => {
 			console.log(`reconnect_error: ${error}`);
 			if (error?.message === 'Authentication error') {
-				window.location.reload();
+				// window.location.reload();
 			}
 		}
 		const onReconnectFailed = () => console.log('reconnect_failed');

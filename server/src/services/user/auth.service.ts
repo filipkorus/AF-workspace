@@ -1,17 +1,11 @@
-import {PrismaClient, RefreshToken, User} from '@prisma/client';
-import {compare, hash} from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
-import ROLE from '../../utils/roles.util';
-import Mailer from '../../utils/mailer.util';
 import {JwtPayload, Secret, sign, verify} from 'jsonwebtoken';
-import fs from 'fs';
 import config from 'config';
-import {Email} from '../../utils/mailer.util';
 import TOKEN from "../../helpers/tokens";
 import {logError} from "../../utils/logger";
 import {OAuth2Client, TokenPayload} from 'google-auth-library';
-
-const prisma = new PrismaClient();
+import {HydratedDocument} from 'mongoose';
+import User, {IUser} from '../../models/user';
+import RefreshToken from '../../models/refreshToken';
 
 const GOOGLE_CLIENT_ID = config.get<string>("GOOGLE_CLIENT_ID");
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -24,33 +18,28 @@ const client = new OAuth2Client(GOOGLE_CLIENT_ID);
  */
 export const emailExists = async (email: string): Promise<boolean> => {
 	try {
-		return await prisma.user.count({where:{email}}) > 0;
+		return await User.findOne({email: new RegExp(email, 'i')}, {refreshTokens: 0, __v: 0}) !== null;
 	} catch (e) {
 		return true;
 	}
 }
 
 /**
- * Save user record in the database.
+ * Saves user record in the database.
  *
  * @returns Boolean indicating success.
  * @param email {string} User's email.
  * @param name {string} User's name.
  * @param picture {string} User's picture URL.
  */
-export const createUser = async ({email, name, picture}) : Promise<boolean> => {
+export const createUser = async ({email, name, picture}): Promise<boolean> => {
 	try {
-		const created = await prisma.user.create({
-			data: {
-				email,
-				name: name || '',
-				picture: picture || '',
-				role: ROLE.USER
-			}
+		const user: HydratedDocument<IUser> = await User.create({
+			email, name, picture
 		});
-		return created != null;
-	} catch (e) {
-		logError(e);
+		return user != null;
+	} catch (error) {
+		logError(error);
 		return false;
 	}
 };
@@ -61,10 +50,10 @@ export const createUser = async ({email, name, picture}) : Promise<boolean> => {
  * @returns {Promise<User> | null} User object or null if error.
  * @param email {string} User's email.
  */
-export const getUserByEmail = async (email: string) : Promise<User> | null => {
+export const getUserByEmail = async (email: string): Promise<IUser> | null => {
 	try {
-		return await prisma.user.findFirst({where:{email}});
-	} catch (e) {
+		return await User.findOne({email: new RegExp(email, 'i')}, {refreshTokens: 0, __v: 0});
+	} catch (error) {
 		return null;
 	}
 };
@@ -76,15 +65,15 @@ export const getUserByEmail = async (email: string) : Promise<User> | null => {
  * @param email {string} User's email.
  * @returns Boolean indicating success or not.
  */
-export const updateNameAndPicture = async (newName: string, newPicture: string, email: string) : Promise<boolean> => {
+export const updateNameAndPicture = async (newName: string, newPicture: string, email: string): Promise<boolean> => {
 	try {
-		await prisma.user.update({
-			where:{email},
-			data: {
+		await User.findOneAndUpdate(
+			{email},
+			{
 				name: newName,
 				picture: newPicture
 			}
-		});
+		);
 		return true;
 	} catch (e) {
 		return false;
@@ -97,46 +86,46 @@ export const updateNameAndPicture = async (newName: string, newPicture: string, 
  * @returns {string} JWT refresh token.
  * @param userId {number} User's ID.
  */
-export const generateRefreshToken = async (userId: number) => {
+export const generateRefreshToken = async (userId: string): Promise<string> => {
 	const refreshToken = sign({
-			id: userId
+			_id: userId
 		},
 		config.get<Secret>("REFRESH_TOKEN"),
-		{expiresIn:config.get<string>("REFRESH_TOKEN_TTL")}
+		{expiresIn: config.get<string>("REFRESH_TOKEN_TTL")}
 	);
 
 	// save refresh token to DB
 	const expiresAt = new Date();
 	expiresAt.setDate(expiresAt.getDate() + 7); // add 7 days to current time
 	try {
-		await prisma.refreshToken.create({
-			data: {
-				userId: userId,
-				token: refreshToken,
-				expiresAt
+		await User.findOneAndUpdate(
+			{_id: userId},
+			{
+				$push: {
+					refreshTokens: new RefreshToken({
+						token: refreshToken,
+						expiresAt
+					})
+				}
 			}
-		});
-	} catch (e) {}
+		)
+	} catch (error) {}
 
 	return refreshToken;
 };
 
 /**
- * Returns refresh token object from the database.
+ * Returns boolean indicating if refresh token is valid.
  *
- * @returns Refresh token record or null if error.
+ * @returns Boolean indicating token validity.
+ * @param token Refresh token.
  * @param userId {number} User's ID.
  */
-export const getRefreshToken = async (userId: number) : Promise<RefreshToken> | null => {
+export const isRefreshTokenValid = async (token: string, userId: string): Promise<boolean> => {
 	try {
-		return await prisma.refreshToken.findFirst({
-			where: {
-				userId,
-				expiresAt: {gte: new Date()}
-			}
-		});
+		return (await User.findOne({_id: userId}, {refreshTokens: 1}))?.refreshTokens.find(refreshToken => refreshToken.token === token && (new Date(refreshToken.expiresAt) > new Date())) != null;
 	} catch (e) {
-		return null;
+		return false;
 	}
 };
 
@@ -145,21 +134,25 @@ export const getRefreshToken = async (userId: number) : Promise<RefreshToken> | 
  *
  * @param refreshToken {string} JWT refresh token.
  */
-export const deleteRefreshToken = async (refreshToken: string) : Promise<void> => {
+export const deleteRefreshToken = async (refreshToken: string): Promise<void> => {
 	try {
-		await prisma.refreshToken.delete({where:{token:refreshToken}});
-	} catch (e) {}
+		await User.findOneAndUpdate(
+			{},
+			{$pull: {refreshTokens: {token: refreshToken}}}
+		)
+	} catch (error) {}
 }
 
 /**
  * Deletes all expired refresh tokens from the database.
  */
-export const deleteExpiredRefreshTokens = async () : Promise<void> => {
+export const deleteExpiredRefreshTokens = async (): Promise<void> => {
 	try {
-		await prisma.refreshToken.deleteMany({
-			where:{expiresAt:{lt:new Date()}}
-		});
-	} catch (e) {}
+		await User.updateMany(
+			{},
+			{$pull: {refreshTokens: {token: {"$lt": new Date()}}}}
+		)
+	} catch (error) {}
 };
 
 /**
@@ -168,7 +161,7 @@ export const deleteExpiredRefreshTokens = async () : Promise<void> => {
  * @returns JWT access token.
  * @param userId
  */
-export const generateAccessToken = (userId: number) : string => {
+export const generateAccessToken = (userId: string): string => {
 	return sign(
 		{id: userId},
 		config.get<string>("ACCESS_TOKEN"),
@@ -183,7 +176,7 @@ export const generateAccessToken = (userId: number) : string => {
  * @param token {string} JWT access or refresh token.
  * @param accessOrRefresh {string} Token type.
  */
-export const verifyToken = (token: string, accessOrRefresh: string) : string | JwtPayload | null => {
+export const verifyToken = (token: string, accessOrRefresh: string): string | JwtPayload | null => {
 	try {
 		return verify(token, config.get<string>(accessOrRefresh == TOKEN.REFRESH_TOKEN ? "REFRESH_TOKEN" : "ACCESS_TOKEN"));
 	} catch (e) {
@@ -197,10 +190,10 @@ export const verifyToken = (token: string, accessOrRefresh: string) : string | J
  * @returns User or null if error.
  * @param userId {number} User's ID.
  */
-export const getUserById = async (userId: number) : Promise<User> | null => {
+export const getUserById = async (userId: string): Promise<HydratedDocument<IUser>> | null => {
 	try {
-		return await prisma.user.findFirst({where:{id:userId}});
-	} catch (e) {
+		return await User.findOne({_id: userId}, {refreshTokens: 0, __v: 0});
+	} catch (error) {
 		return null;
 	}
 };
@@ -210,7 +203,7 @@ export const getUserById = async (userId: number) : Promise<User> | null => {
  * @param oAuthToken {string} Google OAuth token.
  * @returns TokenPayload or null if error.
  */
-export const verifyGoogleToken = async (oAuthToken: string) : Promise<TokenPayload | null> => {
+export const verifyGoogleToken = async (oAuthToken: string): Promise<TokenPayload | null> => {
 	try {
 		const ticket = await client.verifyIdToken({
 			idToken: oAuthToken,

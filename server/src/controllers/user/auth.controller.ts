@@ -1,7 +1,7 @@
 import {
 	emailExists, createUser, getUserByEmail, generateRefreshToken,
 	generateAccessToken, deleteRefreshToken, verifyToken,
-	getRefreshToken, deleteExpiredRefreshTokens, verifyGoogleToken, updateNameAndPicture
+	isRefreshTokenValid, deleteExpiredRefreshTokens, verifyGoogleToken, updateNameAndPicture
 } from '../../services/user/auth.service';
 import config from 'config';
 import TOKEN from '../../helpers/tokens';
@@ -45,14 +45,14 @@ export const LoginHandler = async (req, res) => {
 		return ACCOUNT_BANNED(res);
 	}
 
-	const refreshToken = await generateRefreshToken(user.id);
+	const refreshToken = await generateRefreshToken(user._id);
 	res.cookie(TOKEN.REFRESH_TOKEN, refreshToken, {
 		httpOnly: true,
 		maxAge: config.get<number>('MAX_AGE_TOKEN_COOKIE'),
 		sameSite: 'strict'
 	});
 
-	const accessToken = generateAccessToken(user.id);
+	const accessToken = generateAccessToken(user._id);
 
 	const data = {
 		token: accessToken,
@@ -75,12 +75,11 @@ export const RefreshTokenHandler = async (req, res) => {
 		return UNAUTHORIZED(res);
 	}
 
-	const dbToken = await getRefreshToken(payload.id);
-	if (dbToken == null) {
+	if (!(await isRefreshTokenValid(refreshToken, payload._id))) {
 		return UNAUTHORIZED(res);
 	}
 
-	const newAccessToken = generateAccessToken(payload.id);
+	const newAccessToken = generateAccessToken(payload._id);
 
 	return RESPONSE(res, 'Access token has been refreshed', 200, {token: newAccessToken});
 };

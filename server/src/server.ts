@@ -11,6 +11,7 @@ import router from './routes/main.router';
 import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
 import {logInfo} from "./utils/logger";
+import {SUCCESS} from './helpers/responses/messages';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -52,6 +53,13 @@ io.on('connection', socket => {
 
 	socket.on('msg', message => logInfo(`${socket.user.name} (socket.id=${socket.id}) sent message: ${message}`));
 });
+
+// endpoint for testing purposes
+app.get('/mdb', async (req, res) => {
+	return SUCCESS(res, {
+		testing: true
+	})
+})
 
 /* SERVE STATIC FILES (FRONTEND) */
 // app.use('/', express.static(config.get<string>("STATIC_FILES_DIR")));

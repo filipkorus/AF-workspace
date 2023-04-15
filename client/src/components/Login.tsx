@@ -36,11 +36,11 @@ const Login = () => {
 			btn.style.width = '100%';
 		}
 
-		// google.accounts.id.prompt();
+		google.accounts.id.prompt();
 
 		google.accounts.id.initialize({
 			client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-			auto_select: !isLoggedOut,
+			auto_select: false,//!isLoggedOut,
 			callback: async (response: any) => {
 				setError('');
 				setIsLoggedOut(false);

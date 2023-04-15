@@ -2,6 +2,9 @@ import {getUserById, verifyToken} from '../services/user/auth.service';
 import {ACCOUNT_BANNED, UNAUTHORIZED} from '../helpers/responses/messages';
 import TOKEN from '../helpers/tokens';
 import {logInfo} from "../utils/logger";
+import {HydratedDocument} from 'mongoose';
+import {IUser} from '../models/user';
+import {JwtPayload} from 'jsonwebtoken';
 
 /**
  * User authentication - express middleware.
@@ -13,7 +16,7 @@ async function requireAuth (req, res, next) {
 		return UNAUTHORIZED(res);
 	}
 
-	const user = await getUserById(payload.id);
+	const user: IUser = await getUserById(payload.id);
 	if (user == null) {
 		return UNAUTHORIZED(res);
 	}
@@ -34,7 +37,7 @@ async function requireSocketIOAuth (socket, next) {
 		return next(new Error('Authentication error'));
 	}
 
-	const user = await getUserById(payload.id);
+	const user: IUser = await getUserById(payload.id);
 	if (user == null) {
 		return next(new Error('Authentication error'));
 	}

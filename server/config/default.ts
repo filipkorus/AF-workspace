@@ -17,7 +17,7 @@ export default {
 	// USERNAME_LENGTH: {min:6, max:25}, // in case of changes - modify schema.prisma as well
 	// PASSWORD_LENGTH: {min:8, max:50},
 
-	DB_URL: process.env.DB_URL,
+	MONGO_URI: process.env.MONGO_URI,
 
 	SMTP_ENDPOINT: process.env.SMTP_ENDPOINT,
 	SMTP_USERNAME: process.env.SMTP_USERNAME,
