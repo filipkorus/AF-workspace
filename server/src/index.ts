@@ -1,11 +1,10 @@
 import server from './server';
-import {logError, logInfo} from './utils/logger';
+import {logInfo} from './utils/logger';
 import config from 'config';
-import mongoose from 'mongoose';
-import {connect} from '../config/db';
+import {connectDB} from '../config/db';
 
 const PORT = config.get<number>('PORT') || 3000;
 
-connect();
-
-server.listen(PORT, () => logInfo(`Server is running on port ${PORT}`));
+connectDB()
+	.then((msg: string) => server.listen(PORT, () => logInfo(`Server is running on port ${PORT}`)))
+	.catch(error => process.exit(1));

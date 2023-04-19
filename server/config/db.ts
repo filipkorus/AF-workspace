@@ -2,13 +2,16 @@ import mongoose from 'mongoose';
 import config from 'config';
 import {logError, logInfo} from '../src/utils/logger';
 
-export const connect = async () => {
+export const connectDB = () => new Promise(async (resolve, reject) => {
 	try {
 		const conn = await mongoose.connect(config.get<string>('MONGO_URI'));
 
-		logInfo(`MongoDB connected: ${conn.connection.host}`);
+		const msg = `MongoDB connected: ${conn.connection.host}`;
+
+		logInfo(msg);
+		resolve(msg);
 	} catch (error) {
 		logError(error);
-		process.exit(1);
+		reject(error);
 	}
-}
+});
