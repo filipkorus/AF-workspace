@@ -1,2 +1,16 @@
 strong { font-weight: bold !important; }
 em { font-style: italic !important; }
+
+.ql-container.ql-snow {
+    height: auto;
+    resize: vertical;
+
+}
+.ql-editor {
+    height: auto;
+    max-height: calc(89vh - 42px);
+    overflow-y: scroll;
+    resize: vertical;
+
+}
+
