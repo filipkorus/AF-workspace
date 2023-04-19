@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef} from "react";
-import Quill, {QuillOptionsStatic} from "quill";
+import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import "../../styles/QuillEditor.css"
 import {LinearProgress} from '@mui/material';
@@ -31,6 +31,7 @@ const QuillEditor = ({disabled}: { disabled: boolean }) => {
 					[{'align': []}],
 				],
 			},
+			placeholder: "What's on your mind?",
 			theme: "snow"
 		};
 		quill.current = new Quill(editor, options)
@@ -46,10 +47,14 @@ const QuillEditor = ({disabled}: { disabled: boolean }) => {
 			id="container"
 			ref={wrapperRef}
 			style={{
-				height: '96%',
+				//height: "calc(100%-42px)",
+				height:"auto",
+				maxHeight:"99%", //rozmiar kartki tej biales
 				width: '99%',
 				margin: 0,
-				backgroundColor: 'whitesmoke'
+				backgroundColor: 'whitesmoke',
+
+
 			}}
 		></div>
 	</>;
