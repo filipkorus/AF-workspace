@@ -1,11 +1,13 @@
 import React, {useCallback, useEffect, useRef} from "react";
-import Quill from "quill";
+import Quill, {DeltaOperation} from "quill";
 import "quill/dist/quill.snow.css";
 import "../../styles/QuillEditor.css"
 import {LinearProgress} from '@mui/material';
+import {useSocket} from '../../contexts/SocketContext';
 
-const QuillEditor = ({disabled}: { disabled: boolean }) => {
+const QuillEditor = () => {
     const quill = useRef<any>(null);
+    const {socket, isConnected}: any = useSocket();
 
     const wrapperRef = useCallback((wrapper: any) => {
         if (wrapper == null) return;
@@ -38,11 +40,26 @@ const QuillEditor = ({disabled}: { disabled: boolean }) => {
     }, [])
 
     useEffect(() => {
-        quill.current.enable(!disabled);
-    }, [disabled]);
+        quill.current.enable(isConnected);
+    }, [isConnected]);
+
+    useEffect(() => {
+        if (socket == null || quill == null) return;
+
+        const handler =  (delta: DeltaOperation, oldDelta: DeltaOperation, source: string) => {
+            if (source !== 'user') return;
+            socket.volatile.emit('msg', delta);
+        };
+
+        quill.current.on('text-change', handler);
+
+        return () => {
+            quill.current.off('text-change', handler);
+        };
+    }, [quill.current]);
 
     return <>
-        {disabled && <LinearProgress color="secondary" sx={{width: '99%'}}/>}
+        {!isConnected && <LinearProgress color="secondary" sx={{width: '99%'}}/>}
         <div
             id="container"
             ref={wrapperRef}

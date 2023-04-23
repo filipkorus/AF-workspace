@@ -7,14 +7,14 @@ function color(s: string, c: string) {
 	}
 	return s;
 }
-const deepGrey = "30;1";
+const white = "29;1";
 
 export const logInfo = (mess: string) => {
 	if (process.env.NODE_ENV !== "test" || process.env.FORCE_LOG === "true") {
-		console.log(`[${chalk.cyan("INFO")}] ${color(dayjs().format("HH:mm:ss"), deepGrey)} ${chalk.green(mess)}`);
+		console.log(`[${chalk.cyan("INFO")}] ${color(dayjs().format("HH:mm:ss"), white)} ${chalk.green(mess)}`);
 	}
 };
 
 export const logError = (mess: unknown) => {
-	console.log(`[${chalk.red("ERROR")}] ${color(dayjs().format("HH:mm:ss"), deepGrey)}: ${chalk.red(mess)}`);
+	console.log(`[${chalk.red("ERROR")}] ${color(dayjs().format("HH:mm:ss"), white)}: ${chalk.red(mess)}`);
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Avatar, Box, Button, Grid, LinearProgress} from '@mui/material';
 import theme from '../../utils/theme';
 import {useParams} from 'react-router-dom';
@@ -11,8 +11,6 @@ const Center = () => {
     const {currentUser}: any = useAuth();
 
     const [value, setValue] = useState('');
-
-    const [disabled, setDisabled] = useState(false);
 
     return (
         <Grid
@@ -27,7 +25,7 @@ const Center = () => {
             }}
         >
             <Box style={{height: '99%'}}>
-               <QuillEditor disabled={disabled}/>
+               <QuillEditor/>
             </Box>
         </Grid>
     );

@@ -10,7 +10,7 @@ import {emailToLowerCase} from './middleware/emailToLowerCase';
 import router from './routes/main.router';
 import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
-import {logInfo} from "./utils/logger";
+import {logError, logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
 
 const app = express();
@@ -43,18 +43,41 @@ app.use('/api', router);
 
 io.use(requireSocketIOAuth);
 io.on('connection', socket => {
-	logInfo(`${socket.user.name} (socket.id=${socket.id}) connected to socket server`);
+	logInfo(`[socket] ${socket.user.name} connected to server`);
 
 	socket.emit('greeting-from-server', {
 		msg: 'Hello Client'
 	});
 
-	socket.on('disconnect', () => logInfo(`${socket.user.name} (socket.id=${socket.id}) disconnected from socket server`));
+	socket.on('disconnect', () => logInfo(`[socket] ${socket.user.name} disconnected from server`));
 
-	socket.on('msg', message => logInfo(`${socket.user.name} (socket.id=${socket.id}) sent message: ${message}`));
+	// TODO: remove in production
+	socket.on('msg', message => logInfo(`[socket] ${socket.user.name} sent msg: ${message}`));
+
+	socket.on('join-workspace', room => {
+		try {
+			logInfo(`[socket] ${socket.user.name} joined room: ` + room);
+			socket.join(room);
+			socket.to(room).emit('user joined', socket.id);
+		} catch (e) {
+			logError(`[socket error] ${socket.user.name} joined room: ` + e);
+			socket.emit('error', 'couldnt perform requested action');
+		}
+	});
+
+	socket.on('leave-workspace', room => {
+		try {
+			logInfo(`[socket] ${socket.user.name} left room: ` + room);
+			socket.leave(room);
+			socket.to(room).emit('user left', socket.id);
+		} catch (e) {
+			logError(`[socket error] ${socket.user.name} left room: ` + e);
+			socket.emit('error', 'couldnt perform requested action');
+		}
+	})
 });
 
-// endpoint for testing purposes
+// TODO: remove in production
 app.get('/mdb', async (req, res) => {
 	return SUCCESS(res, {
 		testing: true
