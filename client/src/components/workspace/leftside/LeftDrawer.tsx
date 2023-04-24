@@ -135,7 +135,7 @@ const LeftDrawer = (props:Props) => {
                      // maxHeight:"100vh",
                      maxWidth:"100vw",
                  }}>
-                <QuillEditor disabled={disabled}/>
+                <QuillEditor/>
             </Box>
 
         </Box>

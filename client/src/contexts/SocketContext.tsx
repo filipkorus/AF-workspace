@@ -9,15 +9,16 @@ export function useSocket() {
 }
 
 export function SocketProvider({children}: { children: JSX.Element }) {
-	const [socket, setSocket] = useState<Socket|null>(null);
+	const [socket, setSocket] = useState<Socket | null>(null);
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 	const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
 
 	useEffect(() => {
+		const accessToken = (api.defaults.headers.common['Authorization'] as string)?.split(' ')[1];
 		const newSocket = io('http://localhost:5000', {
 			// autoConnect: false,
 			auth: {
-				token: (api.defaults.headers.common['Authorization'] as string)?.split(' ')[1]
+				token: accessToken
 			},
 			rejectUnauthorized: true
 		});
@@ -35,7 +36,9 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 		const onConnectError = (error: Error) => {
 			console.log(`connect_error due to ${error.message}`);
 			if (error.message === 'Authentication error') {
-				window.location.reload();
+				if (accessToken != null) {
+					window.location.reload();
+				}
 			}
 		}
 		const onReconnect = (attempt: number) => {
