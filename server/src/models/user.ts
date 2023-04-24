@@ -20,7 +20,8 @@ export interface IUser {
 const userSchema = new Schema<IUser>({
 	email: {
 		type: String,
-		required: true
+		required: true,
+		index: { unique: true }
 	},
 	name: {
 		type: String,

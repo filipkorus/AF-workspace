@@ -6,10 +6,12 @@ import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 
 import Workspace from './components/Workspace';
+import {SocketProvider} from './contexts/SocketContext';
 
 const App = () => {
 	return <Router>
 		<AuthProvider>
+			<SocketProvider>
 			<Routes>
 				<Route path="/" element={<PrivateRoute />}>
 					<Route path="/" element={<Dashboard/>}/>
@@ -18,6 +20,7 @@ const App = () => {
 				<Route path="/login" element={<Login/>} />
 				<Route path="*" element={<div>404 Not Found</div>} />
 			</Routes>
+			</SocketProvider>
 		</AuthProvider>
 	</Router>;
 }
