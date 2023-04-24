@@ -42,19 +42,11 @@ const QuillEditor = ({disabled}: { disabled: boolean }) => {
     }, [disabled]);
 
     return <>
-        {disabled && <LinearProgress color="secondary" sx={{width: '99%'}}/>}
+        {disabled && <LinearProgress color="secondary" sx={{width: '100vh'}}/>}
         <div
-            id="container"
             ref={wrapperRef}
             style={{
-                //height: "calc(100%-42px)",
-                height: "auto",
-                maxHeight: "99%", //rozmiar kartki tej biales
-                width: '99%',
-                margin: 0,
                 backgroundColor: 'whitesmoke',
-
-
             }}
         ></div>
     </>;
