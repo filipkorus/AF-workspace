@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 import {useNavigate, Link as RouterLink} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
 import {Alert, Avatar, Box, Button, Container} from '@mui/material';
+import {useSocket} from '../contexts/SocketContext';
 
 const Dashboard = () => {
 	const [error, setError] = useState('');
@@ -10,12 +11,17 @@ const Dashboard = () => {
 	const { currentUser, logout } : any = useAuth();
 	const navigate = useNavigate();
 
+	const {socket}: any = useSocket();
+
 	const handleLogout = async () => {
 		setError('');
 
 		const {success, error} = await logout();
 
 		if (success) {
+			if (socket != null) {
+				socket.disconnect();
+			}
 			return navigate('/login?loggedOut=true');
 		}
 

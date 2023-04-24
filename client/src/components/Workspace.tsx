@@ -41,6 +41,8 @@ const Workspace = () => {
 	}, [isConnected]);
 
 	useEffect(() => {
+		if (socket != null) socket.connect();
+
 		return () => {
 			for (let timeout of timeoutRef.current) {
 				clearTimeout(timeout);
