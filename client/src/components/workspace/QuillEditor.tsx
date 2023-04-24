@@ -59,19 +59,11 @@ const QuillEditor = () => {
     }, [quill.current]);
 
     return <>
-        {!isConnected && <LinearProgress color="secondary" sx={{width: '99%'}}/>}
+        {!isConnected && <LinearProgress color="secondary" sx={{width: '100vh'}}/>}
         <div
-            id="container"
             ref={wrapperRef}
             style={{
-                //height: "calc(100%-42px)",
-                height: "auto",
-                maxHeight: "99%", //rozmiar kartki tej biales
-                width: '99%',
-                margin: 0,
                 backgroundColor: 'whitesmoke',
-
-
             }}
         ></div>
     </>;

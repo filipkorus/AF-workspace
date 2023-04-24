@@ -24,9 +24,9 @@ const Center = () => {
                 alignContent: "center"
             }}
         >
-            <Box style={{height: '99%'}}>
-               <QuillEditor/>
-            </Box>
+            {/*<Box style={{height: '99%'}}>*/}
+            {/*   <QuillEditor disabled={disabled}/>*/}
+            {/*</Box>*/}
         </Grid>
     );
 };
