@@ -5,8 +5,9 @@ import LeftDrawer from "./workspace/leftside/LeftDrawer";
 import Center from './workspace/Center';
 import RightSide from './workspace/RightSide';
 import logo from '../assets/logo.png';
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useSocket} from '../contexts/SocketContext';
+import RightDrawer from "./workspace/RightDrawer";
 
 const Workspace = () => {
 	const {id} : any = useParams();
@@ -67,6 +68,7 @@ const Workspace = () => {
             {/*center komentujemy najprawdopodobniej na zawze -> right side roboczo*/}
             {/*<Center/>*/}
             {/*<RightSide/>*/}
+			<RightDrawer/>
         </div>
 
         <Snackbar open={openReconnectedSnackbar}>
@@ -78,6 +80,7 @@ const Workspace = () => {
                 <Alert severity="warning">Reconnecting...</Alert>
             </Box>
         </Snackbar>
+		<RightDrawer workspaceId={id}/>
     </>;
 };
 
