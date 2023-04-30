@@ -4,7 +4,7 @@ import theme from '../../utils/theme';
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../contexts/AuthContext';
 import {useState} from "react";
-import QuillEditor from "./QuillEditor";
+import QuillEditor from "./leftside/QuillEditor";
 
 const Center = () => {
     const {id} = useParams();
