@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useRef} from "react";
-import Quill, {DeltaOperation} from "quill";
-import "quill/dist/quill.snow.css";
-import "../../../styles/QuillEditor.css"
+import React, {LegacyRef, useCallback, useEffect, useRef} from 'react';
 import {LinearProgress} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
+import Quill, {DeltaOperation} from 'quill';
+import 'quill/dist/quill.snow.css';
+import '../../../styles/QuillEditor.css';
 
 const QuillEditor = () => {
     const quill = useRef<any>(null);
@@ -13,8 +13,11 @@ const QuillEditor = () => {
         if (wrapper == null) return;
 
         wrapper.innerHTML = '';
+
         const editor = document.createElement('div');
+        editor.classList.add('quill-editor');
         wrapper.append(editor);
+
         const options = {
             modules: {
                 toolbar: [
@@ -36,11 +39,12 @@ const QuillEditor = () => {
             placeholder: "What's on your mind?",
             theme: "snow"
         };
-        quill.current = new Quill(editor, options)
-    }, [])
+        quill.current = new Quill(editor, options);
+    }, []);
 
     useEffect(() => {
         quill.current.enable(isConnected);
+        quill.current.focus();
     }, [isConnected]);
 
     useEffect(() => {
@@ -59,12 +63,10 @@ const QuillEditor = () => {
     }, [quill.current]);
 
     return <>
-        {!isConnected && <LinearProgress color="secondary" sx={{width: '100vh'}}/>}
+        {!isConnected && <LinearProgress color="secondary"/>}
         <div
             ref={wrapperRef}
-            style={{
-                backgroundColor: 'whitesmoke',
-            }}
+            className='bg-whitesmoke'
         ></div>
     </>;
 }

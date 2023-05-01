@@ -7,6 +7,7 @@
     border: none;
     outline: none;
 }
+
 .logo-animation {
     animation-name: logo-animation;
     animation-duration: 3.5s;
@@ -14,6 +15,10 @@
     animation-iteration-count: infinite;
     /*margin-top: 20px;*/
     padding: 10px;
+}
+
+.bg-whitesmoke {
+    background-color: whitesmoke;
 }
 
 @keyframes logo-animation {

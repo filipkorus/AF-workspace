@@ -1,17 +1,7 @@
 strong { font-weight: bold !important; }
 em { font-style: italic !important; }
 
-.ql-container.ql-snow {
-    height: auto;
-    resize: vertical;
-
+.quill-editor {
+    height: calc(87vh - 40px);
+    word-break: break-word;
 }
-.ql-editor {
-    /*height: calc(89vh - 42px);*/
-    height: 80vh;
-    /*max-height: calc(89vh - 42px);*/
-    /*overflow-y: scroll;*/
-    resize: vertical;
-
-}
-
