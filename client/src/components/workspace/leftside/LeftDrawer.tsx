@@ -116,9 +116,6 @@ const LeftDrawer = () => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        Menu
-                    </Typography>
                 </Toolbar>
             </AppBar>
             <Drawer

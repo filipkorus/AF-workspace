@@ -3,7 +3,6 @@ import {useAuth} from '../contexts/AuthContext';
 import {Alert, Box, Grid, LinearProgress, Snackbar} from '@mui/material';
 import LeftDrawer from "./workspace/leftside/LeftDrawer";
 import Center from './workspace/Center';
-import RightSide from './workspace/RightSide';
 import logo from '../assets/logo.png';
 import React, {useEffect, useRef, useState} from 'react';
 import {useSocket} from '../contexts/SocketContext';
