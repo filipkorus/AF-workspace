@@ -5,7 +5,7 @@ import LeftDrawer from './workspace/leftside/LeftDrawer';
 import React, {useEffect, useRef, useState} from 'react';
 import {useSocket} from '../contexts/SocketContext';
 import RightDrawer from './workspace/RightDrawer';
-import QuillEditor from './workspace/leftside/QuillEditor';
+import QuillEditor from './workspace/QuillEditor';
 import Chat from './workspace/Chat';
 
 const Workspace = () => {
@@ -25,17 +25,20 @@ const Workspace = () => {
 			return;
 		}
 
-		socket.emit('join-workspace', id);
-
 		if (!firstRender.current) {
 			setOpenReconnectedSnackbar(true);
 			timeoutRef.current.push(setTimeout(() => setOpenReconnectedSnackbar(false), 5000));
 		}
+
+		socket.emit('join-workspace', id);
+
 		setOpenReconnectingSnackbar(false);
 
 		firstRender.current = false;
 
 		return () => {
+			if (!isConnected) return;
+
 			socket.emit('leave-workspace', id);
 		};
 	}, [isConnected]);

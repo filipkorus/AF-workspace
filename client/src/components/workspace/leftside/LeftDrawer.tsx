@@ -38,6 +38,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
 					overlap="circular"
 					anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
 					variant="dot"
+					key={i}
 				>
 					<Avatar
 						src={currentUser.picture}

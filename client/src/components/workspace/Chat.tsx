@@ -2,13 +2,18 @@ import React, {useState} from 'react';
 import {List, ListItem, ListItemIcon, ListItemText} from '@mui/material';
 import {ChatBubbleOutline} from '@mui/icons-material';
 import ChatInput from './ChatInput';
+import {useSocket} from '../../contexts/SocketContext';
 
 const Chat = () => {
+	const {socket, isConnected}: any = useSocket();
+
 	const [messages, setMessages] = useState<string[]>([]);
 	const handleSendMessage = (msg: { text: string, timestamp: string }) => {
+		if (!isConnected) return;
+
 		setMessages([...messages, msg.text]);
 	};
-
+	
 	return (
 		<>
 			<List>
