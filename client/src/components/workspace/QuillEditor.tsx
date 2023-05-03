@@ -1,9 +1,9 @@
 import React, {LegacyRef, useCallback, useEffect, useRef} from 'react';
 import {LinearProgress} from '@mui/material';
-import {useSocket} from '../../../contexts/SocketContext';
+import {useSocket} from '../../contexts/SocketContext';
 import Quill, {DeltaOperation} from 'quill';
 import 'quill/dist/quill.snow.css';
-import '../../../styles/QuillEditor.css';
+import '../../styles/QuillEditor.css';
 
 const QuillEditor = () => {
     const quill = useRef<any>(null);
