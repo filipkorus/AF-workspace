@@ -6,6 +6,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useSocket} from '../contexts/SocketContext';
 import RightDrawer from './workspace/RightDrawer';
 import QuillEditor from './workspace/leftside/QuillEditor';
+import Chat from './workspace/Chat';
 
 const Workspace = () => {
 	const {id}: any = useParams();
@@ -62,17 +63,7 @@ const Workspace = () => {
 					<QuillEditor/>
 				</LeftDrawer>
 				<RightDrawer>
-					<>
-						<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias aspernatur at consequatur culpa
-							dolor
-							doloribus eaque enim eos fugiat, fugit illo illum minus, modi nemo obcaecati saepe, sint vitae
-							voluptatem.
-						</div>
-						<div>Ad autem earum eligendi enim excepturi harum id incidunt, ipsam magni modi nemo nisi, non nostrum
-							numquam, odio quae qui repellat sequi velit voluptatum. Deserunt facilis harum laudantium voluptate
-							voluptatem?
-						</div>
-					</>
+					<Chat/>
 				</RightDrawer>
 			</Box>
 		</div>

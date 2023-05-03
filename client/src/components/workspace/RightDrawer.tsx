@@ -41,11 +41,11 @@ const RightDrawer = ({children}: { children?: JSX.Element }) => {
 
 	const handleDrawerOpen = () => setOpen(true);
 	const handleDrawerClose = () => setOpen(false);
-  
-   const [messages, setMessages] = useState<string[]>([]);
-    const handleSendMessage = (msg: {text: string, timestamp: string}) => {
-        setMessages([...messages, msg.text]);
-    };
+
+	const [messages, setMessages] = useState<string[]>([]);
+	const handleSendMessage = (msg: { text: string, timestamp: string }) => {
+		setMessages([...messages, msg.text]);
+	};
 
 	return <>
 
@@ -90,41 +90,6 @@ const RightDrawer = ({children}: { children?: JSX.Element }) => {
 
 			<Box style={{margin: '.7rem'}} className='bg-whitesmoke'>
 				{children}
-        <List>
-                    {['Chat'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemIcon>
-                                <ChatBubbleOutline style={{marginLeft: 12}}/>
-                            </ListItemIcon>
-                            <ListItemText primary={text}/>
-                        </ListItem>
-                    ))}
-                </List>
-                <div style={{
-                    position: 'fixed',
-                    bottom: 70,
-                    overflowX: "hidden",
-                    wordBreak: 'break-all',
-                    width: "260px",
-                    marginLeft: "4px",
-                    marginRight: "2px"
-                }}>
-                    {messages.map((message, index) => (
-                        <div style={{
-                            backgroundColor: "lavender",
-                            borderRadius: "10px",
-                            wordBreak: 'break-all',
-                            marginTop: "3px",
-                            marginBottom: "2px"
-                        }}
-                             key={index}>
-                            {message}
-                        </div>
-                    ))}
-                </div>
-                <div style={{position: 'fixed', bottom: 0, margin: "2px", borderRadius: "10px"}}>
-                    <ChatInput handleSendMessage={handleSendMessage}/>
-                </div>
 			</Box>
 		</Drawer>
 	</>;
