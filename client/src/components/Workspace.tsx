@@ -1,16 +1,15 @@
-import {useParams} from "react-router-dom";
+import {useParams} from 'react-router-dom';
 import {useAuth} from '../contexts/AuthContext';
-import {Alert, Box, Grid, LinearProgress, Snackbar} from '@mui/material';
-import LeftDrawer from "./workspace/leftside/LeftDrawer";
-import Center from './workspace/Center';
-import logo from '../assets/logo.png';
+import {Alert, Box, LinearProgress, Snackbar} from '@mui/material';
+import LeftDrawer from './workspace/leftside/LeftDrawer';
 import React, {useEffect, useRef, useState} from 'react';
 import {useSocket} from '../contexts/SocketContext';
-import RightDrawer from "./workspace/RightDrawer";
+import RightDrawer from './workspace/RightDrawer';
+import QuillEditor from './workspace/leftside/QuillEditor';
 
 const Workspace = () => {
-	const {id} : any = useParams();
-	const {currentUser} : any = useAuth();
+	const {id}: any = useParams();
+	const {currentUser}: any = useAuth();
 
 	const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
 	const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
@@ -50,37 +49,44 @@ const Workspace = () => {
 		};
 	}, []);
 
-    return <>
-        <div style={{
-            backgroundColor: "#F0B4E4",
-            // backgroundImage: `url(${logo})`,
-            // backgroundSize: "auto",
-            // backgroundRepeat: "no-repeat",
-            // backgroundPosition: "center",
-            // height: '110%',
-            display: 'flex',
-            flexFlow: 'column',
-            height: '100%',
-            // padding: '10px'
-        }}>
-            <LeftDrawer/>
-            {/*center komentujemy najprawdopodobniej na zawze -> right side roboczo*/}
-            {/*<Center/>*/}
-            {/*<RightSide/>*/}
-			<RightDrawer/>
-        </div>
+	return <>
+		<div style={{
+			backgroundColor: "#F0B4E4",
+			display: 'flex',
+			flexFlow: 'column',
+			height: '100%',
+			overflowY: 'hidden'
+		}}>
+			<Box sx={{display: 'flex'}}>
+				<LeftDrawer>
+					<QuillEditor/>
+				</LeftDrawer>
+				<RightDrawer>
+					<>
+						<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias aspernatur at consequatur culpa
+							dolor
+							doloribus eaque enim eos fugiat, fugit illo illum minus, modi nemo obcaecati saepe, sint vitae
+							voluptatem.
+						</div>
+						<div>Ad autem earum eligendi enim excepturi harum id incidunt, ipsam magni modi nemo nisi, non nostrum
+							numquam, odio quae qui repellat sequi velit voluptatum. Deserunt facilis harum laudantium voluptate
+							voluptatem?
+						</div>
+					</>
+				</RightDrawer>
+			</Box>
+		</div>
 
-        <Snackbar open={openReconnectedSnackbar}>
-            <Alert severity="success">Reconnected</Alert>
-        </Snackbar>
-        <Snackbar open={openReconnectingSnackbar}>
-            <Box>
-                <LinearProgress color="warning"/>
-                <Alert severity="warning">Reconnecting...</Alert>
-            </Box>
-        </Snackbar>
-		<RightDrawer workspaceId={id}/>
-    </>;
+		<Snackbar open={openReconnectedSnackbar}>
+			<Alert severity="success">Reconnected</Alert>
+		</Snackbar>
+		<Snackbar open={openReconnectingSnackbar}>
+			<Box>
+				<LinearProgress color="warning"/>
+				<Alert severity="warning">Reconnecting...</Alert>
+			</Box>
+		</Snackbar>
+	</>;
 };
 
 export default Workspace;
