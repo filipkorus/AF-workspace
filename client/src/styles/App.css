@@ -34,3 +34,6 @@
         opacity: 0.3;
     }
 }
+textarea{
+    resize: none;
+}
