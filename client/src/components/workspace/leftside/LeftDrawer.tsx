@@ -108,6 +108,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
 					</ListItem>
 				))}
 			</List>
+
 			<Divider/>
 		</Drawer>
 		<Main open={openMain}>
