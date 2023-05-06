@@ -4,10 +4,11 @@ import {useSocket} from '../../contexts/SocketContext';
 import Quill, {DeltaOperation} from 'quill';
 import 'quill/dist/quill.snow.css';
 import '../../styles/QuillEditor.css';
+import {useParams} from 'react-router-dom';
 
 const QuillEditor = () => {
     const quill = useRef<any>(null);
-    const {socket, isConnected}: any = useSocket();
+    const {socket, isConnected, isWorkspaceJoined}: any = useSocket();
 
     const wrapperRef = useCallback((wrapper: any) => {
         if (wrapper == null) return;
@@ -40,19 +41,35 @@ const QuillEditor = () => {
             theme: "snow"
         };
         quill.current = new Quill(editor, options);
+        quill.current.disable();
+        quill.current.setText('Loading...');
     }, []);
 
     useEffect(() => {
+        if (quill.current == null) return;
+        if (quill.current.getText().startsWith('Loading...')) return;
+
         quill.current.enable(isConnected);
-        quill.current.focus();
-    }, [isConnected]);
+    }, [quill.current, isConnected]);
 
     useEffect(() => {
-        if (socket == null || quill == null) return;
+        if (socket == null || quill.current == null || !isWorkspaceJoined) return;
+
+        socket.once('load-document', (document: string) => {
+            console.log(document)
+            quill.current.setText(document); // TODO: should be setContents instead of setText
+            quill.current.enable();
+        });
+
+        socket.emit('get-document');
+    }, [quill.current, socket, isWorkspaceJoined]);
+
+    useEffect(() => {
+        if (socket == null || quill.current == null) return;
 
         const handler =  (delta: DeltaOperation, oldDelta: DeltaOperation, source: string) => {
             if (source !== 'user') return;
-            socket.volatile.emit('msg', delta);
+            socket.volatile.emit('send-changes', delta);
         };
 
         quill.current.on('text-change', handler);
@@ -60,7 +77,21 @@ const QuillEditor = () => {
         return () => {
             quill.current.off('text-change', handler);
         };
-    }, [quill.current]);
+    }, [quill.current, socket]);
+
+    useEffect(() => {
+        if (socket == null || quill.current == null) return;
+
+        const handler =  (changes: DeltaOperation) => {
+            quill.current.updateContents(changes);
+        };
+
+        socket.on('receive-changes', handler);
+
+        return () => {
+            socket.off('receive-changes', handler);
+        };
+    }, [quill.current, socket]);
 
     return <>
         {!isConnected && <LinearProgress color="secondary"/>}

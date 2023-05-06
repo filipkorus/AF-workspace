@@ -11,6 +11,7 @@ export function useSocket() {
 export function SocketProvider({children}: { children: JSX.Element }) {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [isConnected, setIsConnected] = useState<boolean>(false);
+	const [isWorkspaceJoined, setIsWorkspaceJoined] = useState<boolean>(false);
 	const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
 
 	useEffect(() => {
@@ -25,12 +26,12 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 
 		const onConnect = () => {
 			console.log('connect');
-			setIsConnected(true);
+			setIsWorkspaceJoined(true);
 			setReconnectAttempt(0);
 		};
 		const onDisconnect = () => {
 			console.log('disconnect');
-			setIsConnected(false);
+			setIsWorkspaceJoined(false);
 		};
 		const onError = (error: Error) => console.log(`error: ${error}`);
 		const onConnectError = (error: Error) => {
@@ -43,7 +44,7 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 		}
 		const onReconnect = (attempt: number) => {
 			setReconnectAttempt(0);
-			setIsConnected(true);
+			setIsWorkspaceJoined(true);
 			console.log(`reconnect on attempt: ${attempt}`);
 		}
 		const onReconnectAttempt = (attempt: number) => {
@@ -93,9 +94,26 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 		}
 	}, []);
 
+	const joinWorkspace = (workspaceId: string) => {
+		if (socket == null) return;
+
+		socket.emit('join-workspace', workspaceId);
+		setIsWorkspaceJoined(true);
+	};
+
+	const leaveWorkspace = (workspaceId: string) => {
+		if (socket == null) return;
+
+		socket.emit('leave-workspace', workspaceId);
+		setIsWorkspaceJoined(false);
+	};
+
 	const value = {
 		socket,
-		isConnected
+		isConnected: isWorkspaceJoined,
+		joinWorkspace,
+		leaveWorkspace,
+		isWorkspaceJoined
 	} as any;
 
 	return <SocketContext.Provider value={value}>
