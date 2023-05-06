@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-
+import AddIcon from '@mui/icons-material/Add';
+import theme from "../../../utils/theme";
 const ToDos = () => {
     const [list, setList] = useState<any>([]);
     const [input, setInput] = useState("");
@@ -28,11 +29,12 @@ const ToDos = () => {
             <br/>
             <br/>
             <button onClick={() => addTodo(input)}>
-                add
+                <AddIcon style={{color:theme.palette.primary.main, backgroundColor:"white"}}/>
             </button>
             <ul>
                 {list.map((todo: any) => (
                     <li key={todo.id}>
+
                         {todo.todo}
                         {/*usuwanie- przycisk*/}
                         <button onClick={() => deleteTodo(todo.id)} >&times;</button>
