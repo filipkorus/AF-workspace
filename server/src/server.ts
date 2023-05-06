@@ -12,6 +12,7 @@ import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
 import {logError, logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
+import workspace from './models/workspace';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -51,9 +52,6 @@ io.on('connection', socket => {
 
 	socket.on('disconnect', () => logInfo(`[socket] ${socket.user.name} disconnected from server`));
 
-	// TODO: remove in production
-	socket.on('msg', message => logInfo(`[socket] ${socket.user.name} sent msg: ${message}`));
-
 	socket.on('join-workspace', room => {
 		try {
 			logInfo(`[socket] ${socket.user.name} joined room: ` + room);
@@ -63,6 +61,19 @@ io.on('connection', socket => {
 			logError(`[socket error] ${socket.user.name} joined room: ` + e);
 			socket.emit('error', 'couldnt perform requested action');
 		}
+
+		// TODO: remove in production
+		socket.on('msg', message => logInfo(`[socket] ${socket.user.name} sent msg to room "${room}": ${message}`));
+
+		socket.on('send-changes', (delta) => {
+			logInfo(`[socket] ${socket.user.name} sent "send-changes" to room "${room}"`)
+			socket.to(room).emit('receive-changes', delta);
+		});
+
+		socket.on('get-document', () => {
+			logInfo(`[socket] ${socket.user.name} sent "get-document" to room "${room}"`)
+			socket.to(room).emit('load-document', 'this content has been fetched from server');
+		});
 	});
 
 	socket.on('leave-workspace', room => {

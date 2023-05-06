@@ -9,7 +9,7 @@ import QuillEditor from './workspace/QuillEditor';
 import Chat from './workspace/Chat';
 
 const Workspace = () => {
-	const {id}: any = useParams();
+	const {id: workspaceId}: any = useParams();
 	const {currentUser}: any = useAuth();
 
 	const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
@@ -17,7 +17,7 @@ const Workspace = () => {
 	const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 	const firstRender = useRef(true);
 
-	const {socket, isConnected}: any = useSocket();
+	const {socket, isConnected, joinWorkspace, leaveWorkspace, isWorkspaceJoined}: any = useSocket();
 
 	useEffect(() => {
 		if (!isConnected) {
@@ -30,18 +30,24 @@ const Workspace = () => {
 			timeoutRef.current.push(setTimeout(() => setOpenReconnectedSnackbar(false), 5000));
 		}
 
-		socket.emit('join-workspace', id);
-
 		setOpenReconnectingSnackbar(false);
 
 		firstRender.current = false;
 
-		return () => {
-			if (!isConnected) return;
 
-			socket.emit('leave-workspace', id);
-		};
 	}, [isConnected]);
+
+	useEffect(() => {
+		// if (!isWorkspaceJoined) {
+			joinWorkspace(workspaceId);
+		// }
+
+		return () => {
+			// if (!isWorkspaceJoined) return;
+
+			leaveWorkspace(workspaceId);
+		};
+	}, [socket, isConnected]);
 
 	useEffect(() => {
 		if (socket != null) socket.connect();
