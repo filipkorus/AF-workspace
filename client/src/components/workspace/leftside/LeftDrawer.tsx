@@ -146,7 +146,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <ListItemIcon>
                         <AddTaskIcon/>
                     </ListItemIcon>
-                    <ListItemText primary="tudu" />
+                    <ListItemText primary="To Do List" />
                     {openAddTask ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={openAddTask} timeout="auto" unmountOnExit>
