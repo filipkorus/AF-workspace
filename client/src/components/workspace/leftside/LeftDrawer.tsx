@@ -31,7 +31,6 @@ import {useParams} from 'react-router-dom';
 import {useAuth} from '../../../contexts/AuthContext';
 import Main, {AppBar, DrawerHeader, drawerWidth} from '../Main';
 import StyledBadge from '../StyledBadge';
-import Chat from "../Chat";
 import theme from "../../../utils/theme";
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
@@ -86,7 +85,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 >
                     <MenuIcon/>
                 </IconButton>
-                <Box>
+                <Box sx={{marginLeft: '1rem'}}>
                     {/* TODO: zrobic zeby lista aktywnych uzytkownikow byla aligned to right */}
                     <AvatarGroup max={4}>
                         {getActiveUsers()}

@@ -58,10 +58,8 @@ const Workspace = () => {
     return <>
         <div style={{
             backgroundColor: theme.palette.secondary.main,
-            display: 'flex',
             flexFlow: 'column',
-            height: '100%',
-            overflowY: 'hidden'
+            // height: '100%',
         }}>
             <Box sx={{display: 'flex'}}>
                 <LeftDrawer>
@@ -71,17 +69,17 @@ const Workspace = () => {
                     <Chat/>
                 </RightDrawer>
             </Box>
+            <Snackbar open={openReconnectedSnackbar}>
+                <Alert severity="success">Reconnected</Alert>
+            </Snackbar>
+            <Snackbar open={openReconnectingSnackbar}>
+                <Box>
+                    <LinearProgress color="warning"/>
+                    <Alert severity="warning">Reconnecting...</Alert>
+                </Box>
+            </Snackbar>
         </div>
 
-        <Snackbar open={openReconnectedSnackbar}>
-            <Alert severity="success">Reconnected</Alert>
-        </Snackbar>
-        <Snackbar open={openReconnectingSnackbar}>
-            <Box>
-                <LinearProgress color="warning"/>
-                <Alert severity="warning">Reconnecting...</Alert>
-            </Box>
-        </Snackbar>
     </>;
 };
 

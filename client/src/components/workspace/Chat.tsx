@@ -1,8 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {css, List, ListItem, ListItemIcon, ListItemText} from '@mui/material';
-import {ChatBubbleOutline} from '@mui/icons-material';
+import {Box} from '@mui/material';
 import ChatInput from './ChatInput';
-import LeftDrawer from "./leftside/LeftDrawer";
 import {useSocket} from '../../contexts/SocketContext';
 import Message from "./Message";
 import {useAuth} from "../../contexts/AuthContext";
@@ -38,17 +36,7 @@ const Chat = () => {
 
     return (
         <>
-            <List>
-                {['Chat'].map((message, index) => (
-                    <ListItem disablePadding>
-                        <ListItemIcon>
-                            <ChatBubbleOutline style={{marginLeft: 12}}/>
-                        </ListItemIcon>
-                        <ListItemText/>
-                    </ListItem>
-                ))}
-            </List>
-            <div style={{
+            <Box style={{
                 display: "inline-block",
                 position: 'fixed',
                 overflowX: "hidden",
@@ -57,17 +45,16 @@ const Chat = () => {
                 marginLeft: "2px",
                 marginRight: "2px",
                 maxHeight: "79%",
-                overflowY: "scroll",
-
+                overflowY: "auto",
             }}>
                 {messages.map((message, index) => (
                     <Message name={message.sender} content={message.text} timestamp={message.timestamp}
-                             messageId={index} isMyMessage={index % 2 == 0}/>
+                             key={index} isMyMessage={index % 2 == 0}/>
                 ))}
                 <div ref={messageEndRef}/>
                 {/* pusty div użyty do ustawienia referencji */}
-            </div>
-            <div style={{position: 'fixed', bottom: "5px", margin: "2px", borderRadius: "10px"}}>
+            </Box>
+            <div style={{position: 'fixed', bottom: "20px", borderRadius: "10px"}}>
                 <ChatInput handleSendMessage={handleSendMessage}/>
             </div>
         </>

@@ -40,7 +40,7 @@ const ChatInput = ({handleSendMessage}: { handleSendMessage: (msg: { text: strin
                 />
 
                 <Button className="sending" variant="contained"  type="submit" onClick={handleButtonClick}
-                        style={{backgroundColor: "lavenderblush",borderBottomRightRadius:"10px",borderTopRightRadius: "10px", maxWidth:"30px",width: "fit-content"}}>
+                        style={{backgroundColor: "lavenderblush",borderBottomRightRadius:"10px",borderTopRightRadius: "10px", maxWidth:"20px",width: "fit-content"}}>
                     <SendIcon style={{color:theme.palette.primary.main}}/>
                 </Button>
 
