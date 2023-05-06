@@ -7,86 +7,80 @@ import {useSocket} from '../contexts/SocketContext';
 import RightDrawer from './workspace/RightDrawer';
 import QuillEditor from './workspace/QuillEditor';
 import Chat from './workspace/Chat';
+import theme from "../utils/theme";
 
 const Workspace = () => {
-	const {id: workspaceId}: any = useParams();
-	const {currentUser}: any = useAuth();
-
-	const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
-	const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
-	const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-	const firstRender = useRef(true);
-
-	const {socket, isConnected, joinWorkspace, leaveWorkspace, isWorkspaceJoined}: any = useSocket();
-
-	useEffect(() => {
-		if (!isConnected) {
-			setOpenReconnectingSnackbar(true);
-			return;
-		}
-
-		if (!firstRender.current) {
-			setOpenReconnectedSnackbar(true);
-			timeoutRef.current.push(setTimeout(() => setOpenReconnectedSnackbar(false), 5000));
-		}
-
-		setOpenReconnectingSnackbar(false);
-
-		firstRender.current = false;
+    const {id}: any = useParams();
+    const {currentUser}: any = useAuth();
 
 
-	}, [isConnected]);
+    const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
+    const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+    const firstRender = useRef(true);
 
-	useEffect(() => {
-		// if (!isWorkspaceJoined) {
-			joinWorkspace(workspaceId);
-		// }
+    const {socket, isConnected}: any = useSocket();
 
-		return () => {
-			// if (!isWorkspaceJoined) return;
+    useEffect(() => {
+        if (!isConnected) {
+            setOpenReconnectingSnackbar(true);
+            return;
+        }
 
-			leaveWorkspace(workspaceId);
-		};
-	}, [socket, isConnected]);
+        if (!firstRender.current) {
+            setOpenReconnectedSnackbar(true);
+            timeoutRef.current.push(setTimeout(() => setOpenReconnectedSnackbar(false), 5000));
+        }
 
-	useEffect(() => {
-		if (socket != null) socket.connect();
+        socket.emit('join-workspace', id);
 
-		return () => {
-			for (let timeout of timeoutRef.current) {
-				clearTimeout(timeout);
-			}
-		};
-	}, []);
+        setOpenReconnectingSnackbar(false);
 
-	return <>
-		<div style={{
-			backgroundColor: "#F0B4E4",
-			display: 'flex',
-			flexFlow: 'column',
-			height: '100%',
-			overflowY: 'hidden'
-		}}>
-			<Box sx={{display: 'flex'}}>
-				<LeftDrawer>
-					<QuillEditor/>
-				</LeftDrawer>
-				<RightDrawer>
-					<Chat/>
-				</RightDrawer>
-			</Box>
-		</div>
+        firstRender.current = false;
 
-		<Snackbar open={openReconnectedSnackbar}>
-			<Alert severity="success">Reconnected</Alert>
-		</Snackbar>
-		<Snackbar open={openReconnectingSnackbar}>
-			<Box>
-				<LinearProgress color="warning"/>
-				<Alert severity="warning">Reconnecting...</Alert>
-			</Box>
-		</Snackbar>
-	</>;
+        return () => {
+            if (!isConnected) return;
+
+            socket.emit('leave-workspace', id);
+        };
+    }, [isConnected]);
+
+    useEffect(() => {
+        if (socket != null) socket.connect();
+
+        return () => {
+            for (let timeout of timeoutRef.current) {
+                clearTimeout(timeout);
+            }
+        };
+    }, []);
+
+    return <>
+        <div style={{
+            backgroundColor: theme.palette.secondary.main,
+            flexFlow: 'column',
+            // height: '100%',
+        }}>
+            <Box sx={{display: 'flex'}}>
+                <LeftDrawer>
+                    <QuillEditor/>
+                </LeftDrawer>
+                <RightDrawer>
+                    <Chat/>
+                </RightDrawer>
+            </Box>
+            <Snackbar open={openReconnectedSnackbar}>
+                <Alert severity="success">Reconnected</Alert>
+            </Snackbar>
+            <Snackbar open={openReconnectingSnackbar}>
+                <Box>
+                    <LinearProgress color="warning"/>
+                    <Alert severity="warning">Reconnecting...</Alert>
+                </Box>
+            </Snackbar>
+        </div>
+
+    </>;
 };
 
 export default Workspace;

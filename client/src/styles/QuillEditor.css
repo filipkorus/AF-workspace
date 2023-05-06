@@ -3,5 +3,6 @@ em { font-style: italic !important; }
 
 .quill-editor {
     height: calc(87vh - 40px);
+    overflow-y: auto;
     word-break: break-word;
 }

@@ -1,4 +1,4 @@
-import React, {LegacyRef, useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {LinearProgress} from '@mui/material';
 import {useSocket} from '../../contexts/SocketContext';
 import Quill, {DeltaOperation} from 'quill';
