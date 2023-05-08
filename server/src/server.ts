@@ -10,9 +10,9 @@ import {emailToLowerCase} from './middleware/emailToLowerCase';
 import router from './routes/main.router';
 import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
-import {logError, logInfo} from "./utils/logger";
+import {logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
-import {findByIdAndUpdate, findOrCreateWorkspace} from './services/workspace/document.service';
+import {findWorkspaceByIdAndUpdate, findOrCreateWorkspace} from './services/workspace/document.service';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -48,19 +48,17 @@ io.on('connection', socket => {
 
 	socket.on('disconnect', () => logInfo(`[socket] ${socket.user.name} disconnected from server`));
 
-	socket.emit('greeting-from-server', {
-		msg: 'Hello Client'
-	});
-
-	// TODO: remove in production
-	socket.on('msg', message => logInfo(`[socket] ${socket.user.name} sent msg: ${message}`));
+	socket.emit('greeting-from-server', {msg: 'Hello Client'});
 
 	socket.on('get-document', async (workspaceId: string) => {
 		const workspace = await findOrCreateWorkspace(workspaceId, socket.user.id);
 
 		if (workspace == null) {
 			logInfo(`[socket] ${socket.user.name}: event = 'workspace-error'`);
-			return socket.emit('workspace-error', {msg: 'You are not a member of this workspace', error: 'Not Authorized'});
+			return socket.emit('workspace-error', {
+				msg: 'You are not a member of this workspace',
+				error: 'Not Authorized'
+			});
 		}
 		socket.join(workspaceId);
 		logInfo(`[socket] ${socket.user.name} joined workspace`);
@@ -72,7 +70,7 @@ io.on('connection', socket => {
 		});
 
 		socket.on('save-document', async (data) => {
-			await findByIdAndUpdate(workspaceId, data);
+			await findWorkspaceByIdAndUpdate(workspaceId, data);
 			// logInfo(`[socket] ${socket.user.name}: event = 'save-document'`);
 		});
 	});

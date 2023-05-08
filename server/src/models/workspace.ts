@@ -1,4 +1,5 @@
 import {model, Schema} from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 interface IWorkspace {
 	_id: string,
@@ -44,7 +45,7 @@ interface IWorkspaceSharedFile {
 
 const workspaceSchema = new Schema<IWorkspace>({
 	_id: {
-		type: String,
+		type: String
 	},
 	content: {
 		type: Object,
@@ -60,8 +61,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 	},
 	members: [{
 		userId: {
-			type: String,
-			required: true
+			type: String
 		},
 		addedBy: {
 			type: String,
@@ -74,7 +74,8 @@ const workspaceSchema = new Schema<IWorkspace>({
 	}],
 	messages: [{
 		_id: {
-			type: String
+			type: String,
+			default: uuidv4
 		},
 		userId: {
 			type: String,
@@ -91,7 +92,8 @@ const workspaceSchema = new Schema<IWorkspace>({
 	}],
 	todos: [{
 		_id: {
-			type: String
+			type: String,
+			default: uuidv4
 		},
 		addedBy: {
 			type: String,
@@ -112,7 +114,8 @@ const workspaceSchema = new Schema<IWorkspace>({
 	}],
 	sharedFiles: [{
 		_id: {
-			type: String
+			type: String,
+			default: uuidv4
 		},
 		originalFilename: {
 			type: String,

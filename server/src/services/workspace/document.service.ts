@@ -13,7 +13,6 @@ export const findOrCreateWorkspace = async (workspaceId: string, userId: string)
 
 	try {
 		const workspace = await Workspace.findById(workspaceId);
-
 		if (workspace == null) {
 			return await Workspace.create({ _id: workspaceId, content: config.get<string>('QUILL_DOCUMENT_DEFAULT_VALUE'), createdBy: userId });
 		}
@@ -21,7 +20,6 @@ export const findOrCreateWorkspace = async (workspaceId: string, userId: string)
 		if (workspace.createdBy === userId || workspace.members.map(member => member.userId).includes(userId)) {
 			return workspace;
 		}
-
 		return;
 	} catch (error) {
 		logError(error);
@@ -29,7 +27,7 @@ export const findOrCreateWorkspace = async (workspaceId: string, userId: string)
 	}
 }
 
-export const findByIdAndUpdate = async (workspaceId: string, data) => {
+export const findWorkspaceByIdAndUpdate = async (workspaceId: string, data) => {
 	try {
 		await Workspace.findByIdAndUpdate(workspaceId, {content: data});
 	} catch (error) {

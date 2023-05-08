@@ -38,7 +38,7 @@ const QuillEditor = () => {
                     [{'color': []}, {'background': []}],          // dropdown with defaults from theme
                     [{'font': []}],
                     [{'align': []}],
-                ],
+                ]
             },
             placeholder: "What's on your mind?",
             theme: "snow"
@@ -64,7 +64,7 @@ const QuillEditor = () => {
             documentLoaded.current = true;
         });
 
-        socket.emit('get-document', workspaceId);
+        socket.volatile.emit('get-document', workspaceId);
     }, [socket, quill.current, isConnected, workspaceId]);
 
     useEffect(() => {
