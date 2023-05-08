@@ -34,7 +34,7 @@ import StyledBadge from '../StyledBadge';
 import theme from "../../../utils/theme";
 import DragnDrop from "./DragnDrop";
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-import {FileUploader} from "react-drag-drop-files";
+// import {FileUploader} from "react-drag-drop-files";
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     // const [openIndex, setOpenIndex] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
