@@ -26,6 +26,7 @@ const QuillEditor = () => {
             modules: {
                 toolbar: [
                     [{'header': [1, 2, 3, 4, 5, 6, false]}],
+                    [{'font': []}],
 
                     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
                     ['blockquote', 'code-block'],
@@ -36,7 +37,7 @@ const QuillEditor = () => {
                     [{'direction': 'rtl'}],                         // text direction
 
                     [{'color': []}, {'background': []}],          // dropdown with defaults from theme
-                    [{'font': []}],
+
                     [{'align': []}],
                 ]
             },

@@ -12,7 +12,12 @@ import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
 import {logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
-import {findWorkspaceByIdAndUpdate, findOrCreateWorkspace} from './services/workspace/document.service';
+import {
+	findWorkspaceByIdAndUpdate,
+	findOrCreateWorkspace,
+	getAllWorkspacesByUserId
+} from './services/workspace/document.service';
+import Workspace from './models/workspace';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -46,7 +51,10 @@ io.use(requireSocketIOAuth);
 io.on('connection', socket => {
 	logInfo(`[socket] ${socket.user.name} connected to server`);
 
-	socket.on('disconnect', () => logInfo(`[socket] ${socket.user.name} disconnected from server`));
+	socket.on('disconnect', () => {
+		logInfo(`[socket] ${socket.user.name} disconnected from server`);
+		socket.user = null;
+	});
 
 	socket.emit('greeting-from-server', {msg: 'Hello Client'});
 
