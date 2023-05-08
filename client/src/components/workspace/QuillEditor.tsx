@@ -26,6 +26,7 @@ const QuillEditor = () => {
             modules: {
                 toolbar: [
                     [{'header': [1, 2, 3, 4, 5, 6, false]}],
+                    [{'font': []}],
 
                     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
                     ['blockquote', 'code-block'],
@@ -36,9 +37,9 @@ const QuillEditor = () => {
                     [{'direction': 'rtl'}],                         // text direction
 
                     [{'color': []}, {'background': []}],          // dropdown with defaults from theme
-                    [{'font': []}],
+
                     [{'align': []}],
-                ],
+                ]
             },
             placeholder: "What's on your mind?",
             theme: "snow"
@@ -64,7 +65,7 @@ const QuillEditor = () => {
             documentLoaded.current = true;
         });
 
-        socket.emit('get-document', workspaceId);
+        socket.volatile.emit('get-document', workspaceId);
     }, [socket, quill.current, isConnected, workspaceId]);
 
     useEffect(() => {

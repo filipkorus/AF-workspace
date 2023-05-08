@@ -31,29 +31,23 @@ const Workspace = () => {
             timeoutRef.current.push(setTimeout(() => setOpenReconnectedSnackbar(false), 5000));
         }
 
-        // socket.emit('join-workspace', id);
-
         setOpenReconnectingSnackbar(false);
 
         firstRender.current = false;
 
-        return () => {
-            // if (!isConnected) return;
-            //
-            // socket.emit('leave-workspace', id);
-        };
+        return () => {};
     }, [isConnected]);
 
     useEffect(() => {
         if (socket == null) return;
 
-        const errorHandler = (error: any) => alert(error?.msg)
+        const errorHandler = (error: any) => alert(error?.msg);
         socket.on('workspace-error', errorHandler);
 
         return () => {
             socket.off('workspace-error', errorHandler);
         };
-    }, []);
+    }, [socket]);
 
     useEffect(() => {
         if (socket != null) socket.connect();
@@ -71,7 +65,7 @@ const Workspace = () => {
             flexFlow: 'column',
             // height: '100%',
         }}>
-            <Box sx={{display: 'flex'}}>
+            <Box sx={{display: 'flex', height: '100dvh'}}>
                 <LeftDrawer>
                     <QuillEditor/>
                 </LeftDrawer>

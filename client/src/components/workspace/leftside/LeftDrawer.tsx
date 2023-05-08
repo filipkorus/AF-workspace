@@ -5,13 +5,9 @@ import {
     List,
     Divider,
     IconButton,
-    ListItem,
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Avatar,
-    AvatarGroup,
-    Box,
     Collapse
 } from '@mui/material';
 import {
@@ -19,7 +15,6 @@ import {
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
     AddTask as AddTaskIcon,
-    Poll as PollIcon,
     AttachFile as AttachFileIcon,
     SavedSearch as SavedSearchIcon,
     ExpandLess,
@@ -30,11 +25,10 @@ import React, {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../../contexts/AuthContext';
 import Main, {AppBar, DrawerHeader, drawerWidth} from '../Main';
-import StyledBadge from '../StyledBadge';
 import theme from "../../../utils/theme";
 import DragnDrop from "./DragnDrop";
 import SmartToyIcon from '@mui/icons-material/SmartToy';
-// import {FileUploader} from "react-drag-drop-files";
+
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     // const [openIndex, setOpenIndex] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
