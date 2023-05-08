@@ -1,6 +1,7 @@
 import './styles/App.css';
 import {AuthProvider} from './contexts/AuthContext';
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
@@ -15,6 +16,7 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={<PrivateRoute />}>
 					<Route path="/" element={<Dashboard/>}/>
+					<Route path="/workspace" element={<Navigate to={`/workspace/${uuidv4()}`} />}/>
 					<Route path="/workspace/:id" element={<Workspace/>}/>
 				</Route>
 				<Route path="/login" element={<Login/>} />

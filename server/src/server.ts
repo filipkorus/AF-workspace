@@ -12,6 +12,7 @@ import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
 import {logError, logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
+import {findByIdAndUpdate, findOrCreateWorkspace} from './services/workspace/document.service';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -45,36 +46,36 @@ io.use(requireSocketIOAuth);
 io.on('connection', socket => {
 	logInfo(`[socket] ${socket.user.name} connected to server`);
 
+	socket.on('disconnect', () => logInfo(`[socket] ${socket.user.name} disconnected from server`));
+
 	socket.emit('greeting-from-server', {
 		msg: 'Hello Client'
 	});
 
-	socket.on('disconnect', () => logInfo(`[socket] ${socket.user.name} disconnected from server`));
-
 	// TODO: remove in production
 	socket.on('msg', message => logInfo(`[socket] ${socket.user.name} sent msg: ${message}`));
 
-	socket.on('join-workspace', room => {
-		try {
-			logInfo(`[socket] ${socket.user.name} joined room: ` + room);
-			socket.join(room);
-			socket.to(room).emit('user joined', socket.id);
-		} catch (e) {
-			logError(`[socket error] ${socket.user.name} joined room: ` + e);
-			socket.emit('error', 'couldnt perform requested action');
-		}
-	});
+	socket.on('get-document', async (workspaceId: string) => {
+		const workspace = await findOrCreateWorkspace(workspaceId, socket.user.id);
 
-	socket.on('leave-workspace', room => {
-		try {
-			logInfo(`[socket] ${socket.user.name} left room: ` + room);
-			socket.leave(room);
-			socket.to(room).emit('user left', socket.id);
-		} catch (e) {
-			logError(`[socket error] ${socket.user.name} left room: ` + e);
-			socket.emit('error', 'couldnt perform requested action');
+		if (workspace == null) {
+			logInfo(`[socket] ${socket.user.name}: event = 'workspace-error'`);
+			return socket.emit('workspace-error', {msg: 'You are not a member of this workspace', error: 'Not Authorized'});
 		}
-	})
+		socket.join(workspaceId);
+		logInfo(`[socket] ${socket.user.name} joined workspace`);
+		socket.emit('load-document', workspace.content);
+
+		socket.on('send-changes', (delta) => {
+			socket.to(workspaceId).emit('receive-changes', delta);
+			// logInfo(`[socket] ${socket.user.name}: event = 'send-changes'`);
+		});
+
+		socket.on('save-document', async (data) => {
+			await findByIdAndUpdate(workspaceId, data);
+			// logInfo(`[socket] ${socket.user.name}: event = 'save-document'`);
+		});
+	});
 });
 
 // TODO: remove in production

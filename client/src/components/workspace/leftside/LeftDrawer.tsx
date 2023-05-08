@@ -51,28 +51,6 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {id: workspaceId} = useParams<string>();
     const {currentUser}: any = useAuth();
 
-    /**
-     * Jak cos to ta funkcja jest niezaimplementowana - nie pobiera aktywnych uzytkownikow z serwera.
-     */
-    const getActiveUsers = () => {
-        const avatars = [];
-        for (let i = 0; i < 10; ++i) {
-            avatars.push(
-                <StyledBadge
-                    overlap="circular"
-                    anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-                    variant="dot"
-                    key={i}
-                >
-                    <Avatar
-                        src={currentUser.picture}
-                        alt={currentUser.name}
-                        title={currentUser.name}
-                    />
-                </StyledBadge>)
-        }
-        return avatars;
-    }
     return <>
         <CssBaseline/>
         <AppBar position="fixed" open={openMain}>
@@ -85,12 +63,6 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 >
                     <MenuIcon/>
                 </IconButton>
-                <Box sx={{marginLeft: '1rem'}}>
-                    {/* TODO: zrobic zeby lista aktywnych uzytkownikow byla aligned to right */}
-                    <AvatarGroup max={4}>
-                        {getActiveUsers()}
-                    </AvatarGroup>
-                </Box>
             </Toolbar>
         </AppBar>
         <Drawer
