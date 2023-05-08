@@ -2,14 +2,13 @@ import {model, Schema} from 'mongoose';
 
 interface IWorkspace {
 	_id: string,
-	content: string,
+	content: Object,
 	createdBy: string,
 	createdAt: Date,
 	members?: IWorkspaceMember[],
 	messages?: IWorkspaceMessage[],
 	todos?: IWorkspaceTODO[],
-	sharedFiles?: IWorkspaceSharedFile[],
-	polls?: IWorkspacePoll[]
+	sharedFiles?: IWorkspaceSharedFile[]
 }
 
 interface IWorkspaceMember {
@@ -21,12 +20,14 @@ interface IWorkspaceMember {
 }
 
 interface IWorkspaceMessage {
+	_id: string,
 	userId: string,
 	content: string,
 	createdAt: Date
 }
 
 interface IWorkspaceTODO {
+	_id: string,
 	content: string,
 	isDone: boolean,
 	addedBy: string,
@@ -34,65 +35,20 @@ interface IWorkspaceTODO {
 }
 
 interface IWorkspaceSharedFile {
+	_id: string,
 	originalFilename: string,
 	uniqueFilename: string,
 	addedBy: string,
 	addedAt: Date
 }
 
-interface IWorkspacePoll {
-	options: IWorkspacePollOption[],
-	votes?: IWorkspacePollVote[]
-	allowMultipleVotes: boolean,
-	createdBy: string,
-	createdAt: Date
-	endAt: Date
-}
-
-interface IWorkspacePollOption {
-	_id: string,
-	title: string,
-	description: string
-}
-
-interface IWorkspacePollVote {
-	_id: string,
-	optionId: string,
-	createdBy: string,
-	createdAt: Date
-}
-
-const workspacePollOptionSchema = new Schema<IWorkspacePollOption>({
-	title: {
-		type: String,
-		required: true
-	},
-	description: {
-		type: String,
-		required: true
-	}
-});
-const WorkspacePollOption = model('workspacePollOption', workspacePollOptionSchema);
-
-const workspacePollVoteSchema = new Schema<IWorkspacePollVote>({
-	optionId: {
-		type: String,
-		required: true
-	},
-	createdBy: {
-		type: String,
-		required: true
-	},
-	createdAt: {
-		type: Date,
-		default: new Date()
-	}
-});
-const WorkspacePollVote = model('workspacePollVote', workspacePollVoteSchema);
-
 const workspaceSchema = new Schema<IWorkspace>({
+	_id: {
+		type: String,
+	},
 	content: {
-		type: String
+		type: Object,
+		required: true
 	},
 	createdBy: {
 		type: String,
@@ -117,6 +73,9 @@ const workspaceSchema = new Schema<IWorkspace>({
 		}
 	}],
 	messages: [{
+		_id: {
+			type: String
+		},
 		userId: {
 			type: String,
 			required: true
@@ -128,10 +87,12 @@ const workspaceSchema = new Schema<IWorkspace>({
 		createdAt: {
 			type: Date,
 			default: new Date()
-		},
-		select: false
+		}
 	}],
 	todos: [{
+		_id: {
+			type: String
+		},
 		addedBy: {
 			type: String,
 			required: true
@@ -147,10 +108,12 @@ const workspaceSchema = new Schema<IWorkspace>({
 		addedAt: {
 			type: Date,
 			default: new Date()
-		},
-		select: false
+		}
 	}],
 	sharedFiles: [{
+		_id: {
+			type: String
+		},
 		originalFilename: {
 			type: String,
 			required: true
@@ -166,45 +129,17 @@ const workspaceSchema = new Schema<IWorkspace>({
 		addedAt: {
 			type: Date,
 			default: new Date()
-		},
-		select: false
-	}],
-	polls: [{
-		options: [workspacePollOptionSchema],
-		votes: [workspacePollVoteSchema],
-		allowMultipleVotes: {
-			type: Boolean,
-			default: false
-		},
-		createdBy: {
-			type: String,
-			required: true
-		},
-		createdAt: {
-			type: Date,
-			default: new Date()
-		},
-		endAt: {
-			type: Date,
-			required: true
-		},
-		select: false
-	}],
+		}
+	}]
 });
 const Workspace = model('workspace', workspaceSchema);
 
 export {
 	IWorkspace,
-	IWorkspacePoll,
 	IWorkspaceTODO,
 	IWorkspaceSharedFile,
 	IWorkspaceMessage,
 	IWorkspaceMember,
-	IWorkspacePollVote,
-	IWorkspacePollOption,
-
-	WorkspacePollOption,
-	WorkspacePollVote
 };
 
 export default Workspace;

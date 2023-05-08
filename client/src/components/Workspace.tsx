@@ -13,7 +13,6 @@ const Workspace = () => {
     const {id}: any = useParams();
     const {currentUser}: any = useAuth();
 
-
     const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
     const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -32,18 +31,29 @@ const Workspace = () => {
             timeoutRef.current.push(setTimeout(() => setOpenReconnectedSnackbar(false), 5000));
         }
 
-        socket.emit('join-workspace', id);
+        // socket.emit('join-workspace', id);
 
         setOpenReconnectingSnackbar(false);
 
         firstRender.current = false;
 
         return () => {
-            if (!isConnected) return;
-
-            socket.emit('leave-workspace', id);
+            // if (!isConnected) return;
+            //
+            // socket.emit('leave-workspace', id);
         };
     }, [isConnected]);
+
+    useEffect(() => {
+        if (socket == null) return;
+
+        const errorHandler = (error: any) => alert(error?.msg)
+        socket.on('workspace-error', errorHandler);
+
+        return () => {
+            socket.off('workspace-error', errorHandler);
+        };
+    }, []);
 
     useEffect(() => {
         if (socket != null) socket.connect();
@@ -53,7 +63,7 @@ const Workspace = () => {
                 clearTimeout(timeout);
             }
         };
-    }, []);
+    }, [socket]);
 
     return <>
         <div style={{

@@ -14,6 +14,8 @@ export default {
 	STATIC_FILES_DIR: path.resolve(process.env.NODE_ENV === 'production' ?
 		'/app/public/' : '/var/www/nodejs-auth-api/'),
 
+	QUILL_DOCUMENT_DEFAULT_VALUE: '',
+
 	// USERNAME_LENGTH: {min:6, max:25}, // in case of changes - modify schema.prisma as well
 	// PASSWORD_LENGTH: {min:8, max:50},
 
