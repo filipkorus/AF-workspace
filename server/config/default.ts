@@ -16,15 +16,7 @@ export default {
 
 	QUILL_DOCUMENT_DEFAULT_VALUE: '',
 
-	// USERNAME_LENGTH: {min:6, max:25}, // in case of changes - modify schema.prisma as well
-	// PASSWORD_LENGTH: {min:8, max:50},
-
 	MONGO_URI: process.env.MONGO_URI,
-
-	SMTP_ENDPOINT: process.env.SMTP_ENDPOINT,
-	SMTP_USERNAME: process.env.SMTP_USERNAME,
-	SMTP_PASSWORD: process.env.SMTP_PASSWORD,
-	EMAIL_SENDER: process.env.EMAIL_SENDER,
 
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 
