@@ -3,7 +3,6 @@ import http from 'http';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
-import path from 'path';
 import config from 'config';
 import trimmer from './middleware/trimmer';
 import {emailToLowerCase} from './middleware/emailToLowerCase';
@@ -15,9 +14,7 @@ import {SUCCESS} from './helpers/responses/messages';
 import {
 	findWorkspaceByIdAndUpdate,
 	findOrCreateWorkspace,
-	getAllWorkspacesByUserId
 } from './services/workspace/document.service';
-import Workspace from './models/workspace';
 import {getMessages, saveMessage} from './services/workspace/message.service';
 
 const app = express();
