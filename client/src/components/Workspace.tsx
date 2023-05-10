@@ -17,6 +17,7 @@ const Workspace = () => {
     const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
     const firstRender = useRef(true);
+    const [isRoomJoined, setIsRoomJoined] = useState<boolean>(false);
 
     const {socket, isConnected}: any = useSocket();
 
@@ -67,10 +68,10 @@ const Workspace = () => {
         }}>
             <Box sx={{display: 'flex', height: '100dvh'}}>
                 <LeftDrawer>
-                    <QuillEditor/>
+                    <QuillEditor setIsRoomJoined={setIsRoomJoined}/>
                 </LeftDrawer>
                 <RightDrawer>
-                    <Chat/>
+                    <Chat isRoomJoined={isRoomJoined}/>
                 </RightDrawer>
             </Box>
             <Snackbar open={openReconnectedSnackbar}>

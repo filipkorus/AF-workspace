@@ -5,14 +5,14 @@ import theme from "../../utils/theme";
 
 
 
-const ChatInput = ({handleSendMessage}: { handleSendMessage: (msg: { text: string, }) => void }) => {
+const ChatInput = ({handleSendMessage}: { handleSendMessage: (text: string) => void }) => {
     const [msg, setMsg] = useState("");
     const sendChat = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             // const timestamp = Date.now().toLocaleString();
             if (msg.length > 0) {
-                handleSendMessage({text: msg });
+                handleSendMessage(msg);
                 setMsg("");
             }
         }
@@ -20,7 +20,7 @@ const ChatInput = ({handleSendMessage}: { handleSendMessage: (msg: { text: strin
     const handleButtonClick = (e:React.MouseEvent) => {
         e.preventDefault();
         if (msg.length > 0) {
-            handleSendMessage({text: msg });
+            handleSendMessage(msg);
             setMsg("");
         }
     }

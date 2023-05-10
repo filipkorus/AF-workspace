@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect, createContext, useRef} from "react";
 import api from "../api";
-import {User} from '../types';
+import {IUser} from '../types';
 
 const AuthContext = createContext({});
 
@@ -9,7 +9,7 @@ export function useAuth() {
 }
 
 export function AuthProvider({children}: { children: JSX.Element }) {
-	const [currentUser, setCurrentUser] = useState<User | null>(null);
+	const [currentUser, setCurrentUser] = useState<IUser | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const firstUserRequest = useRef<boolean>(true);
 
@@ -17,7 +17,7 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 		try {
 			const {data} = await api.post('/user/auth/login', {credential}, {withCredentials: true});
 
-			setCurrentUser(data?.user as User);
+			setCurrentUser(data?.user as IUser);
 			api.defaults.headers.common['Authorization'] = `Bearer ${data?.token}`;
 			setLoading(false);
 			return {
@@ -64,7 +64,7 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 			.get('/user')
 			.then(res => {
 				if (res.data?.user) {
-					setCurrentUser(res.data?.user as User);
+					setCurrentUser(res.data?.user as IUser);
 					setLoading(false);
 				}
 			})

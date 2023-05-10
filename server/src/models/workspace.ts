@@ -1,5 +1,6 @@
 import {model, Schema} from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import {IUser} from './user';
 
 interface IWorkspace {
 	_id: string,
@@ -14,15 +15,17 @@ interface IWorkspace {
 
 interface IWorkspaceMember {
 	userId: string,
-	isActive: boolean,
-	lastTimeActive: Date,
 	addedBy: string,
 	addedAt: Date
 }
 
 interface IWorkspaceMessage {
 	_id: string,
-	userId: string,
+	author: {
+		_id: string,
+		picture: string,
+		name: string
+	},
 	content: string,
 	createdAt: Date
 }
@@ -79,7 +82,8 @@ const workspaceSchema = new Schema<IWorkspace>({
 		},
 		userId: {
 			type: String,
-			required: true
+			required: true,
+			ref: 'user'
 		},
 		content: {
 			type: String,

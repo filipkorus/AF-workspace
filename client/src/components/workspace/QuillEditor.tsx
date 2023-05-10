@@ -6,7 +6,7 @@ import 'quill/dist/quill.snow.css';
 import '../../styles/QuillEditor.css';
 import {useParams} from 'react-router-dom';
 
-const QuillEditor = () => {
+const QuillEditor = ({setIsRoomJoined}: any) => {
     const quill = useRef<any>(null);
     const documentLoaded = useRef<boolean>(false);
     const {socket, isConnected}: any = useSocket();
@@ -63,6 +63,7 @@ const QuillEditor = () => {
             quill.current.setContents(document);
             quill.current.enable();
             documentLoaded.current = true;
+            setIsRoomJoined(true);
         });
 
         socket.volatile.emit('get-document', workspaceId);

@@ -191,7 +191,7 @@ export const verifyToken = (token: string, accessOrRefresh: string): string | Jw
  */
 export const getUserById = async (userId: string): Promise<HydratedDocument<IUser>> | null => {
 	try {
-		return await User.findOne({_id: userId}, {refreshTokens: 0, __v: 0});
+		return await User.findById(userId, {refreshTokens: 0, __v: 0});
 	} catch (error) {
 		return null;
 	}

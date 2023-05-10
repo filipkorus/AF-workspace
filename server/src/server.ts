@@ -18,6 +18,7 @@ import {
 	getAllWorkspacesByUserId
 } from './services/workspace/document.service';
 import Workspace from './models/workspace';
+import {getMessages, saveMessage} from './services/workspace/message.service';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -59,6 +60,7 @@ io.on('connection', socket => {
 	socket.emit('greeting-from-server', {msg: 'Hello Client'});
 
 	socket.on('get-document', async (workspaceId: string) => {
+		/* document */
 		const workspace = await findOrCreateWorkspace(workspaceId, socket.user.id);
 
 		if (workspace == null) {
@@ -81,11 +83,33 @@ io.on('connection', socket => {
 			await findWorkspaceByIdAndUpdate(workspaceId, data);
 			// logInfo(`[socket] ${socket.user.name}: event = 'save-document'`);
 		});
+
+		/* messages */
+		socket.on('get-messages', async () => {
+			logInfo(`[socket] ${socket.user.name}: event = 'get-messages'`);
+			const messages = await getMessages(workspaceId, socket.user.id);
+
+			if (messages == null) {
+				logInfo(`[socket] ${socket.user.name}: event = 'workspace-error'`);
+				return socket.emit('workspace-error', {
+					msg: 'You are not a member of this workspace',
+					error: 'Not Authorized'
+				});
+			}
+			socket.emit('load-messages', messages);
+		});
+
+		socket.on('send-message', async (msg) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'send-message'`);
+			await saveMessage(workspaceId, socket.user.id, msg);
+			socket.to(workspaceId).emit('receive-message', msg);
+		});
 	});
 });
 
 // TODO: remove in production
 app.get('/mdb', async (req, res) => {
+
 	return SUCCESS(res, {
 		testing: true
 	})
