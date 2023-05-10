@@ -101,8 +101,8 @@ io.on('connection', socket => {
 
 		socket.on('send-message', async (msg) => {
 			logInfo(`[socket] ${socket.user.name}: event = 'send-message'`);
-			await saveMessage(workspaceId, socket.user.id, msg);
 			socket.to(workspaceId).emit('receive-message', msg);
+			await saveMessage(workspaceId, socket.user.id, msg);
 		});
 	});
 });
