@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  backend:
+    image: afworkspace:1.0
+#    volumes:
+#      - /var/data/inkubator:/app/data
+#      - /var/www/inkubator-frontend:/app/public
+    restart: on-failure
+    command: >
+      bash -c "node index.js"
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - ORIGIN=https://afworkspace.fkor.us
