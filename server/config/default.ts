@@ -12,7 +12,7 @@ export default {
 	ORIGIN: process.env.ORIGIN?.split(';') || ['http://localhost:3000'],
 
 	STATIC_FILES_DIR: path.resolve(process.env.NODE_ENV === 'production' ?
-		'/app/public/' : ''),
+		'/app/public/' : 'C:\\Users\\filek7\\Desktop\\sem4\\JPWP\\AF-workspace\\client\\build\\'),
 
 	QUILL_DOCUMENT_DEFAULT_VALUE: '',
 

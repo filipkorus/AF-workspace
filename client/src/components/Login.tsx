@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {useAuth} from "../contexts/AuthContext";
 import {Navigate, useNavigate} from "react-router-dom";
 import {Alert, Box, Container, Grid, LinearProgress, Snackbar, Stack} from '@mui/material';
+import {GoogleLogin} from '@react-oauth/google';
 import theme from "../utils/theme";
 import logo from "../assets/logo.png";
 
@@ -9,52 +10,30 @@ const Login = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 
-	const {login, currentUser} : any = useAuth();
+	const {login, currentUser}: any = useAuth();
 	const navigate = useNavigate();
 
-	const google = (window as any).google || null; /* global google */
 	const params = new URLSearchParams(window.location.search);
 	const [isLoggedOut, setIsLoggedOut] = useState<boolean>(params.get('loggedOut') === 'true');
 	const [isKickedOut, setIsKickedOut] = useState<boolean>(params.get('kickedOut') === 'true');
 
-	useEffect(() => {
-		if (!google) {
-			return;
+	const responseMessage = async (response: any) => {
+		setError('');
+		setIsLoggedOut(false);
+		setIsKickedOut(false);
+		setLoading(true);
+		const {success, error} = await login(response.credential);
+		if (success) {
+			return navigate('/');
 		}
+		setError(error);
+		setLoading(false);
+	};
 
-		google.accounts.id.renderButton(document.getElementById("signInWithGoogleDiv"), {
-			type: 'standard', // standard, icon
-			theme: 'outline', // outline, filled_blue, filled_black
-			size: 'large', // large, medium, small
-			text: 'continue_with', // signin_with, signup_with, continue_with, signin
-			shape: 'rectangular', // rectangular, pill, circle, square,
-			// click_listener: () => console.log('clicked google')
-		});
-
-		const btn = document.getElementById("signInWithGoogleDiv");
-		if (btn) {
-			btn.style.width = '100%';
-		}
-
-		google.accounts.id.prompt();
-
-		google.accounts.id.initialize({
-			client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-			auto_select: false,//!isLoggedOut,
-			callback: async (response: any) => {
-				setError('');
-				setIsLoggedOut(false);
-				setIsKickedOut(false);
-				setLoading(true);
-				const {success, error} = await login(response.credential);
-				if (success) {
-					return navigate('/');
-				}
-				setError(error);
-				setLoading(false);
-			}
-		});
-	}, []); // runs onMount
+	const errorMessage = () => {
+		setError('OAuth error');
+		setLoading(false);
+	};
 
 	return currentUser ?
 		<Navigate to="/"/> :
@@ -80,7 +59,7 @@ const Login = () => {
 					<img className="logo-animation" src={logo} alt="logo"/>
 
 					<Box marginTop='2rem'>
-						{!loading && <div id="signInWithGoogleDiv"></div>}
+						{!loading && <GoogleLogin onSuccess={responseMessage} onError={errorMessage}/>}
 					</Box>
 
 					{error && <Box marginTop='2rem'>
