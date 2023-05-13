@@ -17,6 +17,7 @@ import {
 } from './services/workspace/document.service';
 import {getMessages, saveMessage} from './services/workspace/message.service';
 import path from 'path';
+import {v4 as uuidv4} from 'uuid';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -99,7 +100,16 @@ io.on('connection', socket => {
 
 		socket.on('send-message', async (msg) => {
 			logInfo(`[socket] ${socket.user.name}: event = 'send-message'`);
-			socket.to(workspaceId).emit('receive-message', msg);
+			socket.to(workspaceId).emit('receive-message', {
+				content: msg,
+				createdAt: new Date(),
+				author: {
+					_id: socket.user._id,
+					picture: socket.user.picture,
+					name: socket.user.name
+				},
+				_id: uuidv4()
+			});
 			await saveMessage(workspaceId, socket.user.id, msg);
 		});
 	});

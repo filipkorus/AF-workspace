@@ -52,7 +52,7 @@ const Chat = ({isRoomJoined}: any) => {
 		return () => {
 			socket.off('receive-message', handler);
 		};
-	}, [socket]);
+	}, [socket, messages]);
 
 	const formatDate = (date: Date | string) => {
 		const d = new Date(date);
