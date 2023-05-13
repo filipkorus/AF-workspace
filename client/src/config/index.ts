@@ -1,4 +1,4 @@
-const production = !true;
+const production = true;
 
 export default {
 	production,
