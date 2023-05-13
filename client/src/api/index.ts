@@ -1,7 +1,8 @@
 import axios from "axios";
+import CONFIG from '../config';
 
 const api = axios.create({
-	baseURL: 'http://localhost:5000/api/'
+	baseURL: `${CONFIG.API_URL}/api/`
 });
 
 let refresh = false;

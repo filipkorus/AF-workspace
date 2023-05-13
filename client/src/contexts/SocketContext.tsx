@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import {io, Socket} from 'socket.io-client';
 import api from '../api';
+import CONFIG from '../config';
 
 const SocketContext = createContext(null);
 
@@ -15,7 +16,7 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 
 	useEffect(() => {
 		const accessToken = (api.defaults.headers.common['Authorization'] as string)?.split(' ')[1];
-		const newSocket = io('http://localhost:5000', {
+		const newSocket = io(CONFIG.API_URL, {
 			// autoConnect: false,
 			auth: {
 				token: accessToken
