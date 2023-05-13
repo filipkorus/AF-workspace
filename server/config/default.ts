@@ -12,7 +12,7 @@ export default {
 	ORIGIN: process.env.ORIGIN?.split(';') || ['http://localhost:3000'],
 
 	STATIC_FILES_DIR: path.resolve(process.env.NODE_ENV === 'production' ?
-		'/app/public/' : '/var/www/nodejs-auth-api/'),
+		'/app/public/' : ''),
 
 	QUILL_DOCUMENT_DEFAULT_VALUE: '',
 

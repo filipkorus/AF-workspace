@@ -16,6 +16,7 @@ import {
 	findOrCreateWorkspace,
 } from './services/workspace/document.service';
 import {getMessages, saveMessage} from './services/workspace/message.service';
+import path from 'path';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -113,8 +114,8 @@ app.get('/mdb', async (req, res) => {
 })
 
 /* SERVE STATIC FILES (FRONTEND) */
-// app.use('/', express.static(config.get<string>("STATIC_FILES_DIR")));
-// app.get('*', (req, res) => res.sendFile(path.resolve(config.get<string>("STATIC_FILES_DIR"), 'index.html')))
+app.use('/', express.static(config.get<string>("STATIC_FILES_DIR")));
+app.get('*', (req, res) => res.sendFile(path.resolve(config.get<string>("STATIC_FILES_DIR"), 'index.html')))
 
 // export default app;
 export default httpServer;
