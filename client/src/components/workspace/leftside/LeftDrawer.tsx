@@ -21,16 +21,18 @@ import {
     ExpandMore
 } from "@mui/icons-material";
 import ToDos from './ToDos';
-import React, {useState} from 'react';
-import {useParams} from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../../../contexts/AuthContext';
 import Main, {AppBar, DrawerHeader, drawerWidth} from '../Main';
 import theme from "../../../utils/theme";
 import DragnDrop from "./DragnDrop";
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import {useSocket} from '../../../contexts/SocketContext';
+import WorkspaceList from './WorkspaceList';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
-    // const [openIndex, setOpenIndex] = useState(false);
+    const {socket, isConnected, isRoomJoined}: any = useSocket();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [openDragNDrop, setOpenDragNDrop] = useState(false);
     const [openAddTask, setOpenAddTask] = useState(false);
@@ -50,6 +52,21 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
         setOpen(!open);
     };
 
+    const { currentUser, logout } : any = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        const {success, error} = await logout();
+
+        if (success) {
+            if (socket != null) {
+                socket.disconnect();
+            }
+            return navigate('/login?loggedOut=true');
+        }
+
+        alert(error || 'Failed to log out');
+    }
 
     const [openMain, setOpenMain] = useState(false);
 
@@ -57,7 +74,17 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const handleDrawerClose = () => setOpenMain(false);
 
     const {id: workspaceId} = useParams<string>();
-    const {currentUser}: any = useAuth();
+
+    const [workspaces, setWorkspaces] = useState<[]>([]);
+    useEffect(() => {
+    	if (socket == null || !isRoomJoined) return;
+
+    	socket.once('load-user-workspaces', (workspaces: []) => {
+    		setWorkspaces(workspaces);
+    	});
+
+    	socket.emit('get-user-workspaces');
+    }, [socket, isConnected, isRoomJoined, workspaceId]);
 
     return <>
         <CssBaseline/>
@@ -93,6 +120,23 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
             </DrawerHeader>
             <Divider/>
             <List>
+                <ListItemButton onClick={handleLogout} style={{backgroundColor: theme.palette.primary.main, color: 'whitesmoke'}}>
+                    <ListItemText primary="Logout" sx={{textAlign: 'center'}} />
+                </ListItemButton>
+
+                <ListItemButton onClick={handleClickWork}>
+                    <ListItemIcon>
+                        <SavedSearchIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Your workspaces" />
+                    {openSavedWork ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+                <Collapse in={openSavedWork} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                        <WorkspaceList workspaces={workspaces} />
+                    </List>
+                </Collapse>
+
                 <ListItemButton onClick={handleClickDrag}>
                     <ListItemIcon>
                         <AttachFileIcon />
@@ -107,12 +151,12 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                         </ListItemButton>
                     </List>
                 </Collapse>
-                {/*PRZERWA PRZCYISK*/}
+
                 <ListItemButton onClick={handleClickTask}>
                     <ListItemIcon>
                         <AddTaskIcon/>
                     </ListItemIcon>
-                    <ListItemText primary="To Do List" />
+                    <ListItemText primary="TODO" />
                     {openAddTask ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={openAddTask} timeout="auto" unmountOnExit>
@@ -122,21 +166,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                         </ListItemButton>
                     </List>
                 </Collapse>
-                {/*slslsl*/}
-                <ListItemButton onClick={handleClickWork}>
-                    <ListItemIcon>
-                        <SavedSearchIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Saved work" />
-                    {openSavedWork ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-                <Collapse in={openSavedWork} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        <ListItemButton>
-                            tu jeszcze nicnie ma
-                        </ListItemButton>
-                    </List>
-                </Collapse>
+
                 <ListItemButton onClick={handleClick}>
                     <ListItemIcon>
                         <SmartToyIcon/>

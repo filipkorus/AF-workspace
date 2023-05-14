@@ -7,9 +7,10 @@ import {useAuth} from "../../contexts/AuthContext";
 import '../../styles/Scroll.css';
 import {useParams} from 'react-router-dom';
 import {IWorkspaceMessage} from '../../types';
+import formatDate from '../../utils/formatDate';
 
-const Chat = ({isRoomJoined}: any) => {
-	const {socket, isConnected}: any = useSocket();
+const Chat = () => {
+	const {socket, isConnected, isRoomJoined}: any = useSocket();
 	const {id: workspaceId}: any = useParams();
 	const [messages, setMessages] = useState<IWorkspaceMessage[]>([]);
 	const messageEndRef = useRef<HTMLDivElement>(null); // referencja do końca diva z wiadomościami
@@ -32,7 +33,7 @@ const Chat = ({isRoomJoined}: any) => {
 	useEffect(() => {
 		if (socket == null || !isRoomJoined) return;
 
-		socket.on('load-messages', (messages: IWorkspaceMessage[]) => {
+		socket.once('load-messages', (messages: IWorkspaceMessage[]) => {
 			setMessages(messages);
 		});
 
@@ -54,15 +55,6 @@ const Chat = ({isRoomJoined}: any) => {
 		};
 	}, [socket, messages]);
 
-	const formatDate = (date: Date | string) => {
-		const d = new Date(date);
-		const year = d.getFullYear();
-		const month = ('0' + (d.getMonth() + 1)).slice(-2); // miesiące są liczone od 0 do 11, więc dodajemy 1 i formatujemy zerem z przodu
-		const day = ('0' + d.getDate()).slice(-2);
-		const hours = ('0' + d.getHours()).slice(-2);
-		const minutes = ('0' + d.getMinutes()).slice(-2);
-		return `${day}/${month}/${year} ${hours}:${minutes}`;
-	};
 	useEffect(() => {
 		messageEndRef.current?.scrollIntoView({behavior: "auto"}); // przewijanie do końca diva z wiadomościami po zmianie zawartości
 	}, [messages]);

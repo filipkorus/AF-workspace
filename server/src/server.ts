@@ -13,7 +13,7 @@ import {logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
 import {
 	findWorkspaceByIdAndUpdate,
-	findOrCreateWorkspace,
+	findOrCreateWorkspace, getAllWorkspacesByUserId,
 } from './services/workspace/document.service';
 import {getMessages, saveMessage} from './services/workspace/message.service';
 import path from 'path';
@@ -104,13 +104,20 @@ io.on('connection', socket => {
 				content: msg,
 				createdAt: new Date(),
 				author: {
-					_id: socket.user._id,
+					_id: socket.user.id,
 					picture: socket.user.picture,
 					name: socket.user.name
 				},
 				_id: uuidv4()
 			});
 			await saveMessage(workspaceId, socket.user.id, msg);
+		});
+
+		/* user's workspaces */
+		socket.on('get-user-workspaces', async () => {
+			logInfo(`[socket] ${socket.user.name}: event = 'get-user-workspaces'`);
+			const workspaces = await getAllWorkspacesByUserId(socket.user.id);
+			socket.emit('load-user-workspaces', workspaces);
 		});
 	});
 });

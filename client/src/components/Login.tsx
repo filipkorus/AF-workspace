@@ -5,12 +5,13 @@ import {Alert, Box, Container, Grid, LinearProgress, Snackbar, Stack} from '@mui
 import {GoogleLogin} from '@react-oauth/google';
 import theme from "../utils/theme";
 import logo from "../assets/logo.png";
+import {v4 as uuidv4} from 'uuid';
 
 const Login = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 
-	const {login, currentUser}: any = useAuth();
+	const {login, currentUser, getUserWorkspaces}: any = useAuth();
 	const navigate = useNavigate();
 
 	const params = new URLSearchParams(window.location.search);
@@ -24,7 +25,12 @@ const Login = () => {
 		setLoading(true);
 		const {success, error} = await login(response.credential);
 		if (success) {
-			return navigate('/');
+			const workspaces = await getUserWorkspaces();
+
+			navigate(`/workspace/${workspaces.length > 0 ? workspaces.at(-1)._id : uuidv4()}`);
+
+			window.location.reload();
+			return;
 		}
 		setError(error);
 		setLoading(false);

@@ -13,6 +13,7 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 	const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
+	const [isRoomJoined, setIsRoomJoined] = useState<boolean>(false);
 
 	useEffect(() => {
 		const accessToken = (api.defaults.headers.common['Authorization'] as string)?.split(' ')[1];
@@ -96,7 +97,9 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 
 	const value = {
 		socket,
-		isConnected
+		isConnected,
+		isRoomJoined,
+		setIsRoomJoined
 	} as any;
 
 	return <SocketContext.Provider value={value}>
