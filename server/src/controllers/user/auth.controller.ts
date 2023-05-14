@@ -97,7 +97,3 @@ export const LogoutHandler = async (req, res) => {
 export const GetUserHandler = async (_, res) => {
 	return SUCCESS(res, {user:res.locals.user});
 };
-
-export const GetUserWorkspaces = async (req, res) => {
-	return SUCCESS(res, {workspaces: await getAllWorkspacesByUserId(res.locals.user.id)});
-};

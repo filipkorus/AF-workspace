@@ -6,12 +6,13 @@ import {GoogleLogin} from '@react-oauth/google';
 import theme from "../utils/theme";
 import logo from "../assets/logo.png";
 import {v4 as uuidv4} from 'uuid';
+import {getUserWorkspaces} from '../api/workspace';
 
 const Login = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 
-	const {login, currentUser, getUserWorkspaces}: any = useAuth();
+	const {login, currentUser}: any = useAuth();
 	const navigate = useNavigate();
 
 	const params = new URLSearchParams(window.location.search);

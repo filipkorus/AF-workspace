@@ -32,6 +32,7 @@ import DragnDrop from "./DragnDrop";
 import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
+import {getUserWorkspaces} from '../../../api/workspace';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
@@ -81,12 +82,12 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     useEffect(() => {
     	if (socket == null || !isRoomJoined) return;
 
-    	socket.once('load-user-workspaces', (_workspaces: []) => {
-    		setWorkspaces(_workspaces);
-    	});
-
-    	socket.emit('get-user-workspaces');
-    }, [socket, isConnected, isRoomJoined, workspaceId]);
+        getUserWorkspaces()
+           .then((_workspaces: any) => {
+               setWorkspaces(_workspaces);
+           })
+           .catch((error: any) => {});
+    }, [socket, isConnected, isRoomJoined]);
 
     return <>
         <CssBaseline/>
