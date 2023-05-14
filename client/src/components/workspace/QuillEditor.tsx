@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {LinearProgress} from '@mui/material';
 import {useSocket} from '../../contexts/SocketContext';
 import Quill, {DeltaOperation} from 'quill';
@@ -6,10 +6,10 @@ import 'quill/dist/quill.snow.css';
 import '../../styles/QuillEditor.css';
 import {useParams} from 'react-router-dom';
 
-const QuillEditor = ({setIsRoomJoined}: any) => {
-    const quill = useRef<any>(null);
+const QuillEditor = () => {
+    const [quill, setQuill] = useState<any>(null);
     const documentLoaded = useRef<boolean>(false);
-    const {socket, isConnected}: any = useSocket();
+    const {socket, isConnected, setIsRoomJoined}: any = useSocket();
     const {id: workspaceId}: any = useParams();
     const SAVE_DOCUMENT_INTERVAL_MS = 2000;
 
@@ -44,65 +44,66 @@ const QuillEditor = ({setIsRoomJoined}: any) => {
             placeholder: "What's on your mind?",
             theme: "snow"
         };
-        quill.current = new Quill(editor, options);
-        quill.current.disable();
-        quill.current.setText('Loading content...');
+        const q = new Quill(editor, options);
+        setQuill(q)
+        q.disable();
+        q.setText('Loading content...');
     }, []);
 
     useEffect(() => {
-        if (!documentLoaded.current) return;
+        if (!documentLoaded.current || quill == null) return;
 
-        quill.current.enable(isConnected);
-        quill.current.focus();
-    }, [isConnected]);
+        quill.enable(isConnected);
+        quill.focus();
+    }, [quill, isConnected]);
 
     useEffect(() => {
-        if (socket == null || quill.current == null) return;
+        if (socket == null || quill == null) return;
 
         socket.once('load-document', (document: DeltaOperation) => {
-            quill.current.setContents(document);
-            quill.current.enable();
+            quill.setContents(document);
+            quill.enable();
             documentLoaded.current = true;
             setIsRoomJoined(true);
         });
 
         socket.volatile.emit('get-document', workspaceId);
-    }, [socket, quill.current, isConnected, workspaceId]);
+    }, [socket, quill, isConnected, workspaceId, setIsRoomJoined]);
 
     useEffect(() => {
-        if (socket == null || quill.current == null) return;
+        if (socket == null || quill == null) return;
 
         const interval = setInterval(() => {
-            socket.emit('save-document', quill.current.getContents());
+            socket.emit('save-document', quill.getContents());
         }, SAVE_DOCUMENT_INTERVAL_MS);
 
         return () => {
             clearInterval(interval);
         };
-    }, [socket, quill.current]);
+    }, [socket, quill]);
 
     /* emitting changes */
     useEffect(() => {
-        if (socket == null || quill.current == null) return;
+        if (socket == null || quill == null) return;
 
         const handler =  (delta: DeltaOperation, oldDelta: DeltaOperation, source: string) => {
             if (source !== 'user') return;
             socket.volatile.emit('send-changes', delta);
         };
 
-        quill.current.on('text-change', handler);
+        quill.on('text-change', handler);
 
         return () => {
-            quill.current.off('text-change', handler);
+            quill.off('text-change', handler);
         };
-    }, [socket, quill.current]);
+    }, [socket, quill]);
 
     /* receiving changes */
     useEffect(() => {
-        if (socket == null || quill.current == null) return;
+        if (socket == null || quill == null) return;
 
         const handler =  (delta: DeltaOperation) => {
-            quill.current.updateContents(delta);
+            quill.updateContents(delta);
         };
 
         socket.on('receive-changes', handler);
@@ -110,7 +111,7 @@ const QuillEditor = ({setIsRoomJoined}: any) => {
         return () => {
             socket.off('receive-changes', handler);
         };
-    }, [socket, quill.current]);
+    }, [socket, quill]);
 
     return <>
         {!isConnected && <LinearProgress color="secondary"/>}

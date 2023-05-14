@@ -56,6 +56,18 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 		}
 	}
 
+	const getUserWorkspaces = async () => {
+		try {
+			const {status, data} = await api.get('/user/workspaces');
+			if (status === 200) {
+				return data?.workspaces;
+			}
+			return [];
+		} catch (error) {
+			return [];
+		}
+	};
+
 	useEffect(() => {
 		if (!firstUserRequest.current) return;
 		firstUserRequest.current = false;
@@ -76,7 +88,8 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 	const value = {
 		currentUser,
 		login,
-		logout
+		logout,
+		getUserWorkspaces
 	};
 
 	return <AuthContext.Provider value={value}>

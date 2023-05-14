@@ -9,6 +9,7 @@ import {
 	ACCOUNT_BANNED, BAD_REQUEST, RESPONSE,
 	INVALID_LOGIN_CREDENTIALS, UNAUTHORIZED, ACCOUNT_CREATED, SUCCESS
 } from '../../helpers/responses/messages';
+import {getAllWorkspacesByUserId} from '../../services/workspace/document.service';
 
 export const LoginHandler = async (req, res) => {
 	await deleteExpiredRefreshTokens();
@@ -95,4 +96,8 @@ export const LogoutHandler = async (req, res) => {
 
 export const GetUserHandler = async (_, res) => {
 	return SUCCESS(res, {user:res.locals.user});
+};
+
+export const GetUserWorkspaces = async (req, res) => {
+	return SUCCESS(res, {workspaces: await getAllWorkspacesByUserId(res.locals.user.id)});
 };

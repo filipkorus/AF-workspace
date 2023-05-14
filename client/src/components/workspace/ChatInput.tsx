@@ -2,10 +2,12 @@ import React, {useState} from 'react';
 import {Button, css} from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import theme from "../../utils/theme";
+import {useSocket} from '../../contexts/SocketContext';
 
 
 
 const ChatInput = ({handleSendMessage}: { handleSendMessage: (text: string) => void }) => {
+    const {isConnected}: any = useSocket();
     const [msg, setMsg] = useState("");
     const sendChat = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -37,9 +39,10 @@ const ChatInput = ({handleSendMessage}: { handleSendMessage: (text: string) => v
                     rows={3}
                     wrap="soft"
                     aria-multiline={true}
+                    disabled={!isConnected}
                 />
 
-                <Button className="sending" variant="contained"  type="submit" onClick={handleButtonClick}
+                <Button className="sending" variant="contained" disabled={!isConnected} type="submit" onClick={handleButtonClick}
                         style={{backgroundColor: "lavenderblush",borderBottomRightRadius:"10px",borderTopRightRadius: "10px", maxWidth:"20px",width: "fit-content"}}>
                     <SendIcon style={{color:theme.palette.primary.main}}/>
                 </Button>
