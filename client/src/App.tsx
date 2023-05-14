@@ -18,6 +18,7 @@ const App = () => {
 					<Routes>
 						<Route path="/" element={<PrivateRoute/>}>
 							<Route path="/" element={<Navigate to={`/workspace/${uuidv4()}`}/>}/>
+							<Route path="/workspace" element={<Navigate to={`/workspace/${uuidv4()}`}/>}/>
 							<Route path="/workspace/:id" element={<Workspace/>}/>
 						</Route>
 						<Route path="/login" element={<Login/>}/>
