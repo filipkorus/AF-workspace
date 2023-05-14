@@ -16,9 +16,10 @@ const App = () => {
 			<AuthProvider>
 				<SocketProvider>
 					<Routes>
-						<Route path="/" element={<PrivateRoute/>}>
-							<Route path="/" element={<Navigate to={`/workspace/${uuidv4()}`}/>}/>
-							<Route path="/workspace/:id" element={<Workspace/>}/>
+						<Route index path="/" element={<Login/>}/>
+						<Route path="/workspace" element={<PrivateRoute/>}>
+							<Route path="" element={<Navigate to={`/workspace/${uuidv4()}`}/>}/>
+							<Route path=":id" element={<Workspace/>}/>
 						</Route>
 						<Route path="/login" element={<Login/>}/>
 						<Route path="*" element={<div>404 Not Found</div>}/>
