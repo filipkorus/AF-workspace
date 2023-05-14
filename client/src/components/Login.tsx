@@ -41,6 +41,18 @@ const Login = () => {
 		setLoading(false);
 	};
 
+	useEffect(() => {
+		getUserWorkspaces()
+			.then((workspaces: any) => {
+				if (workspaces.length > 0) {
+					navigate(`/workspace/${workspaces.at(-1)?._id}`)
+					window.location.reload();
+					return;
+				}
+			})
+			.catch((error: any) => {});
+	}, []);
+
 	return <>
 		<Container maxWidth={false} style={{
 			backgroundColor: theme.palette.primary.main,

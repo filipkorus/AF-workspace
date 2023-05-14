@@ -9,7 +9,7 @@ import {useParams} from 'react-router-dom';
 const QuillEditor = () => {
     const [quill, setQuill] = useState<any>(null);
     const documentLoaded = useRef<boolean>(false);
-    const {socket, isConnected, setIsRoomJoined}: any = useSocket();
+    const {socket, isConnected, setIsRoomJoined, isRoomJoined}: any = useSocket();
     const {id: workspaceId}: any = useParams();
     const SAVE_DOCUMENT_INTERVAL_MS = 2000;
 
@@ -74,6 +74,8 @@ const QuillEditor = () => {
         if (socket == null || quill == null) return;
 
         const interval = setInterval(() => {
+            if (!(isRoomJoined && isConnected && documentLoaded.current)) return;
+
             socket.emit('save-document', quill.getContents());
         }, SAVE_DOCUMENT_INTERVAL_MS);
 

@@ -8,7 +8,7 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Collapse
+    Collapse, Button
 } from '@mui/material';
 import {
     Menu as MenuIcon,
@@ -17,6 +17,8 @@ import {
     AddTask as AddTaskIcon,
     AttachFile as AttachFileIcon,
     SavedSearch as SavedSearchIcon,
+    Add as AddIcon,
+    SmartToy as SmartToyIcon,
     ExpandLess,
     ExpandMore
 } from "@mui/icons-material";
@@ -27,7 +29,7 @@ import {useAuth} from '../../../contexts/AuthContext';
 import Main, {AppBar, DrawerHeader, drawerWidth} from '../Main';
 import theme from "../../../utils/theme";
 import DragnDrop from "./DragnDrop";
-import SmartToyIcon from '@mui/icons-material/SmartToy';
+import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
 
@@ -79,8 +81,8 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     useEffect(() => {
     	if (socket == null || !isRoomJoined) return;
 
-    	socket.once('load-user-workspaces', (workspaces: []) => {
-    		setWorkspaces(workspaces);
+    	socket.once('load-user-workspaces', (_workspaces: []) => {
+    		setWorkspaces(_workspaces);
     	});
 
     	socket.emit('get-user-workspaces');
@@ -98,6 +100,9 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 >
                     <MenuIcon/>
                 </IconButton>
+                <Typography variant="h6" noWrap component="div">
+                    {(workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?._id /* tu bedzie nazwa workspace zamiast _id */}
+                </Typography>
             </Toolbar>
         </AppBar>
         <Drawer
@@ -125,9 +130,9 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 </ListItemButton>
 
                 <ListItemButton onClick={handleClickWork}>
-                    <ListItemIcon>
-                        <SavedSearchIcon />
-                    </ListItemIcon>
+                    {/*<ListItemIcon>*/}
+                    {/*    <SavedSearchIcon />*/}
+                    {/*</ListItemIcon>*/}
                     <ListItemText primary="Your workspaces" />
                     {openSavedWork ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
@@ -171,7 +176,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <ListItemIcon>
                         <SmartToyIcon/>
                     </ListItemIcon>
-                    <ListItemText primary="Ask AI/poll" />
+                    <ListItemText primary="Ask AI" />
                     {open ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
                 <Collapse in={open} timeout="auto" unmountOnExit>
@@ -181,6 +186,12 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                         </ListItemButton>
                     </List>
                 </Collapse>
+                <ListItemButton onClick={() => {
+                    navigate('/workspace');
+                    window.location.reload();
+                }} style={{backgroundColor: theme.palette.primary.main, color: 'whitesmoke'}}>
+                    <ListItemText primary="Create new workspace" sx={{textAlign: 'center'}} />
+                </ListItemButton>
             </List>
 
             <Divider/>
