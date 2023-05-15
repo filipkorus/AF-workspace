@@ -9,7 +9,7 @@ import {
 	ACCOUNT_BANNED, BAD_REQUEST, RESPONSE,
 	INVALID_LOGIN_CREDENTIALS, UNAUTHORIZED, ACCOUNT_CREATED, SUCCESS
 } from '../../helpers/responses/messages';
-import {getAllWorkspacesByUserId} from '../../services/workspace/document.service';
+import {deleteWorkspaceById} from '../../services/workspace/document.service';
 
 export const LoginHandler = async (req, res) => {
 	await deleteExpiredRefreshTokens();

@@ -11,3 +11,21 @@ export const getUserWorkspaces = async () => {
 		return [];
 	}
 };
+
+export const deleteWorkspace = async (workspaceIdToDelete: string) => {
+	try {
+		const {status, data} = await api.delete(`/workspace/${workspaceIdToDelete}`);
+		return status === 200;
+	} catch (error) {
+		return false;
+	}
+};
+
+export const renameWorkspace = async (workspaceIdToRename: string, newName: string) => {
+	try {
+		const {status, data} = await api.put(`/workspace/${workspaceIdToRename}`, {name: newName});
+		return status === 200;
+	} catch (error) {
+		return false;
+	}
+};
