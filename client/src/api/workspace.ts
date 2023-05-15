@@ -1,4 +1,5 @@
 import api from './index';
+import {AxiosError} from 'axios';
 
 export const getUserWorkspaces = async () => {
 	try {
@@ -27,5 +28,34 @@ export const renameWorkspace = async (workspaceIdToRename: string, newName: stri
 		return status === 200;
 	} catch (error) {
 		return false;
+	}
+};
+
+/**
+ * @returns HTTP status code of the operation.
+ * @param workspaceId ID of workspace.
+ * @param email Email of user to be added.
+ */
+export const addUserToWorkspaceByEmail = async (workspaceId: string, email: string) => {
+	try {
+		const {status, data} = await api.post(`/workspace/${workspaceId}/member`, {email});
+		return status;
+	} catch (error: any) {
+		return error?.response?.status;
+	}
+};
+
+/**
+ * @returns HTTP status code of the operation.
+ * @param workspaceId ID of workspace.
+ * @param email Email of user to be removed.
+ */
+export const removeUserFromWorkspaceByEmail = async (workspaceId: string, email: string) => {
+	try {
+		const {status, data} = await api.delete(`/workspace/${workspaceId}/member/${email}`);
+		console.log(status, data);
+		return status;
+	} catch (error: any) {
+		return error?.response?.status;
 	}
 };

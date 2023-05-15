@@ -8,7 +8,7 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Collapse, Button
+    Collapse, Button, Box
 } from '@mui/material';
 import {
     Menu as MenuIcon,
@@ -18,6 +18,7 @@ import {
     AttachFile as AttachFileIcon,
     SavedSearch as SavedSearchIcon,
     Add as AddIcon,
+    PersonAdd as PersonAddIcon,
     SmartToy as SmartToyIcon,
     ExpandLess,
     ExpandMore
@@ -33,6 +34,8 @@ import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
 import {getUserWorkspaces, renameWorkspace} from '../../../api/workspace';
+import AddUserToWorkspace from './AddUserToWorkspace';
+import RemoveUserFromWorkspace from './RemoveUserFromWorkspace';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
@@ -76,8 +79,6 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const handleDrawerOpen = () => setOpenMain(true);
     const handleDrawerClose = () => setOpenMain(false);
 
-    const {id: workspaceId} = useParams<string>();
-
     const [workspaces, setWorkspaces] = useState<[]>([]);
     useEffect(() => {
     	if (socket == null || !isRoomJoined) return;
@@ -88,6 +89,9 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
            })
            .catch((error: any) => {});
     }, [socket, isConnected, isRoomJoined]);
+
+    const {id: workspaceId} = useParams<string>();
+    const workspaceName = (workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?.name || '';
 
     return <>
         <CssBaseline/>
@@ -101,8 +105,10 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 >
                     <MenuIcon/>
                 </IconButton>
+                <AddUserToWorkspace workspaceName={workspaceName}/>
+                <RemoveUserFromWorkspace workspaceName={workspaceName}/>
                 <Typography variant="h6" noWrap component="div">
-                    {(workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?.name}
+                    {workspaceName}
                 </Typography>
             </Toolbar>
         </AppBar>

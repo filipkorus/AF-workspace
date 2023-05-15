@@ -99,10 +99,11 @@ const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 				  }
                <ListItemButton
                    onClick={() => handleRedirectAndReload(`/workspace/${workspace._id}`)}
+                   disabled={workspace._id === workspaceId}
                >
-                  {workspace.name.slice(0, 15)}
+                  {workspace.name.slice(0, 14)}
 					</ListItemButton>
-               <IconButton aria-label="delete" title="rename this workspace" size="small"
+               <IconButton aria-label="rename" title="rename this workspace" size="small"
                            onClick={() => handleRenameWorkspace({id:workspace._id, name:workspace.name})}>
                    <EditIcon fontSize="inherit" color="primary"/>
                </IconButton>

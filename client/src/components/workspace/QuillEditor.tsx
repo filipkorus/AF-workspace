@@ -74,7 +74,7 @@ const QuillEditor = () => {
         if (socket == null || quill == null) return;
 
         const interval = setInterval(() => {
-            if (!(isRoomJoined && isConnected && documentLoaded.current)) return;
+            if (!(isRoomJoined && documentLoaded.current)) return;
 
             socket.emit('save-document', quill.getContents());
         }, SAVE_DOCUMENT_INTERVAL_MS);

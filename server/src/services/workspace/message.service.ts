@@ -2,6 +2,7 @@ import config from 'config';
 import Workspace, {IWorkspaceMessage} from '../../models/workspace';
 import {logError} from '../../utils/logger';
 import {regexLatitude} from '../../helpers/validation/regexes';
+import {isUserMemberOrCreatorOfWorkspace} from './document.service';
 
 /**
  * Adds new message to a workspace.
@@ -39,8 +40,7 @@ export const getMessages = async (workspaceId: string, userId: string, n: number
 			})
 		);
 
-
-		if (workspace.createdBy === userId || workspace.members.map(member => member.userId).includes(userId)) {
+		if (await isUserMemberOrCreatorOfWorkspace(workspaceId, userId)) {
 			return workspace.messages.map((message: any) => {
 				const {userId: author, content, createdAt, _id} = message;
 				return {
