@@ -12,7 +12,7 @@ import {requireSocketIOAuth} from "./middleware/requireAuth";
 import {logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
 import {
-	findWorkspaceByIdAndUpdate,
+	findWorkspaceByIdAndUpdateContent,
 	findOrCreateWorkspace, getAllWorkspacesByUserId,
 } from './services/workspace/document.service';
 import {getMessages, saveMessage} from './services/workspace/message.service';
@@ -79,7 +79,7 @@ io.on('connection', socket => {
 		});
 
 		socket.on('save-document', async (data) => {
-			await findWorkspaceByIdAndUpdate(workspaceId, data);
+			await findWorkspaceByIdAndUpdateContent(workspaceId, data);
 			// logInfo(`[socket] ${socket.user.name}: event = 'save-document'`);
 		});
 

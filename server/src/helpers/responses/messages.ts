@@ -21,6 +21,8 @@ export const ACCOUNT_DELETED = (res: Response, data: object = {}) => respond(res
 
 export const BAD_REQUEST = (res: Response, data: object = {}) => respond(res,"Bad request", 400, data);
 
+export const CONFLICT = (res: Response, data: object = {}) => respond(res,"Conflict", 409, data);
+
 export const UNAUTHORIZED = (res: Response, data: object = {}) => respond(res, "Unauthorized", 401, data);
 
 export const FORBIDDEN = (res: Response, data: object = {}) => respond(res, "Forbidden", 403, data);

@@ -1,10 +1,10 @@
 import {model, Schema} from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import {IUser} from './user';
 
 interface IWorkspace {
 	_id: string,
 	content: Object,
+	name: string,
 	createdBy: string,
 	createdAt: Date,
 	members?: IWorkspaceMember[],
@@ -52,6 +52,10 @@ const workspaceSchema = new Schema<IWorkspace>({
 	},
 	content: {
 		type: Object,
+		required: true
+	},
+	name: {
+		type: String,
 		required: true
 	},
 	createdBy: {

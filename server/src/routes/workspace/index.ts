@@ -1,9 +1,21 @@
-import requireAuth from '../../middleware/requireAuth';
-import {GetUserWorkspaces} from '../../controllers/workspace';
+import {
+	AddWorkspaceMemberHandler,
+	DeleteWorkspaceHandler,
+	GetUserWorkspacesHandler, RemoveWorkspaceMemberHandler,
+	RenameWorkspaceHandler
+} from '../../controllers/workspace';
 import {Router} from 'express';
 
 const router = Router();
 
-router.get('/', requireAuth, GetUserWorkspaces);
+/* middleware requireAuth has been applied earlier, so it is not necessary here */
+
+router.get('/', GetUserWorkspacesHandler);
+
+router.delete('/:id', DeleteWorkspaceHandler);
+router.put('/:id', RenameWorkspaceHandler);
+router.post('/:id/member', AddWorkspaceMemberHandler);
+
+router.delete('/:id/member/:email', RemoveWorkspaceMemberHandler);
 
 export default router;
