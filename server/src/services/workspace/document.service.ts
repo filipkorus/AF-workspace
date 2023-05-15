@@ -1,6 +1,7 @@
 import config from 'config';
 import Workspace from '../../models/workspace';
 import {logError} from '../../utils/logger';
+import {FORBIDDEN} from '../../helpers/responses/messages';
 
 /**
  * Finds existing or creates new workspace in DB.
@@ -103,3 +104,34 @@ export const addMemberToWorkspace = async (workspaceId: string, memberId: string
 		logError(error);
 	}
 };
+
+/**
+ * Removes a member from a workspace.
+ * @param workspaceId ID of workspace.
+ * @param memberIdToRemove ID of user whose membership to remove.
+ */
+export const removeMemberFromWorkspace = async (workspaceId: string, memberIdToRemove: string) => {
+	try {
+		await Workspace.findOneAndUpdate({_id: workspaceId}, {
+			pull:{members: {userId: memberIdToRemove}}
+		});
+	} catch (error) {
+		logError(error);
+	}
+};
+
+/**
+ * Checks if user is a creator or a member of a workspace.
+ * @param workspaceId ID of workspace to be checked.
+ * @param userId ID of user to be checked.
+ */
+export const isUserMemberOrCreatorOfWorkspace = async (workspaceId: string, userId: string): Promise<boolean | null> => {
+	const workspace = await getWorkspaceById(workspaceId);
+
+	if (workspace == null) {
+		return null;
+	}
+
+	return workspace.createdBy === userId || workspace.members.map(member => member.userId).includes(userId);
+};
+
