@@ -58,9 +58,10 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
         setOpen(!open);
     };
 
-    const { currentUser, logout } : any = useAuth();
+    const {currentUser, logout}: any = useAuth();
     const navigate = useNavigate();
-
+    const handleSendToDo = (text: string) => {
+    }
     const handleLogout = async () => {
         const {success, error} = await logout();
 
@@ -73,7 +74,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
 
         alert(error || 'Failed to log out');
     }
-
+    
     const [openMain, setOpenMain] = useState(false);
 
     const handleDrawerOpen = () => setOpenMain(true);
