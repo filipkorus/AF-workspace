@@ -32,7 +32,7 @@ import DragnDrop from "./DragnDrop";
 import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
-import {getUserWorkspaces} from '../../../api/workspace';
+import {getUserWorkspaces, renameWorkspace} from '../../../api/workspace';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
@@ -102,7 +102,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <MenuIcon/>
                 </IconButton>
                 <Typography variant="h6" noWrap component="div">
-                    {(workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?._id /* tu bedzie nazwa workspace zamiast _id */}
+                    {(workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?.name}
                 </Typography>
             </Toolbar>
         </AppBar>
@@ -139,7 +139,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 </ListItemButton>
                 <Collapse in={openSavedWork} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <WorkspaceList workspaces={workspaces} />
+                        <WorkspaceList workspaces={workspaces} setWorkspaces={setWorkspaces} />
                     </List>
                 </Collapse>
 

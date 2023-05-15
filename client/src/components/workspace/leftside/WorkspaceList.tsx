@@ -4,32 +4,43 @@ import {ListItemButton, ListItem, IconButton, Dialog, DialogTitle, DialogContent
 import {useNavigate, useParams} from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useAuth} from '../../../contexts/AuthContext';
+import {deleteWorkspace} from '../../../api/workspace';
 
-const WorkspaceList = ({workspaces}: any) => {
+const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 	const {currentUser}: any = useAuth();
 	const {id: workspaceId}: any = useParams();
 	const navigate = useNavigate();
 	const [openDialog, setOpenDialog] = useState<boolean>(false);
-	const [workspaceIdToDelete, setWorkspaceIdToDelete] = useState<string | null>(null);
+	const [workspaceToDelete, setWorkspaceToDelete] = useState<{ id: string, name: string } | null>(null);
 
 	const handleRedirectAndReload = (newRoute: string) => {
 		navigate(newRoute);
 		window.location.reload();
 	};
 
-	const handleDeleteWorkspace = (workspaceId: string) => {
-		setWorkspaceIdToDelete(workspaceId);
+	const handleDeleteWorkspace = ({id, name}: {id: string, name: string}) => {
+		setWorkspaceToDelete({id, name});
 		setOpenDialog(true);
 	};
 
-	const handleDeleteDialogClose = (deleteWorkspace: boolean) => {
+	const handleDeleteDialogClose = async (_deleteWorkspace: boolean) => {
 		setOpenDialog(false);
-		if (!deleteWorkspace) {
-			setWorkspaceIdToDelete(null);
+		if (!_deleteWorkspace) {
+			setWorkspaceToDelete(null);
 			return;
 		}
 
-		// delete workspace with ID = workspaceIdToDelete
+		if (workspaceToDelete == null) {
+			return;
+		}
+
+		if (!(await deleteWorkspace(workspaceToDelete.id))) {
+			setWorkspaceToDelete(null);
+			return;
+		}
+
+		setWorkspaces(workspaces.filter((workspace: any) => workspace._id !== workspaceToDelete?.id));
+		setWorkspaceToDelete(null);
 	};
 
 	return <>
@@ -38,14 +49,15 @@ const WorkspaceList = ({workspaces}: any) => {
               <ListItem>
 	              {workspace.createdBy === currentUser._id &&
 		               <IconButton aria-label="delete" title="delete this workspace" size="small"
-                              onClick={() => handleDeleteWorkspace(workspace._id)}>
+                              onClick={() => handleDeleteWorkspace({id:workspace._id, name:workspace.name})}>
                       <DeleteIcon fontSize="inherit" color="error"/>
                      </IconButton>
+
 					  }
                   <ListItemButton
                       onClick={() => handleRedirectAndReload(`/workspace/${workspace._id}`)}
                   >
-	                  {workspace._id.slice(0, 13) /* tu bedzie nazwa zamiast ucietego _id */}
+	                  {workspace.name.slice(0, 15)}
 						</ListItemButton>
               </ListItem>
           </ListItem>)
@@ -62,7 +74,7 @@ const WorkspaceList = ({workspaces}: any) => {
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText id="alert-dialog-description">
-					Chosen workspace ID = {workspaceIdToDelete}
+					Chosen workspace: {workspaceToDelete?.name}
 				</DialogContentText>
 			</DialogContent>
 			<DialogActions>

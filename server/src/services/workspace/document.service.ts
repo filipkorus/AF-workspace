@@ -14,7 +14,7 @@ export const findOrCreateWorkspace = async (workspaceId: string, userId: string)
 	try {
 		const workspace = await Workspace.findById(workspaceId);
 		if (workspace == null) {
-			return await Workspace.create({ _id: workspaceId, content: config.get<string>('QUILL_DOCUMENT_DEFAULT_VALUE'), createdBy: userId });
+			return await Workspace.create({ _id: workspaceId, content: config.get<string>('QUILL_DOCUMENT_DEFAULT_VALUE'), name: workspaceId, createdBy: userId });
 		}
 
 		if (workspace.createdBy === userId || workspace.members.map(member => member.userId).includes(userId)) {
@@ -27,9 +27,17 @@ export const findOrCreateWorkspace = async (workspaceId: string, userId: string)
 	}
 }
 
-export const findWorkspaceByIdAndUpdate = async (workspaceId: string, data) => {
+export const findWorkspaceByIdAndUpdateContent = async (workspaceId: string, data) => {
 	try {
 		await Workspace.findByIdAndUpdate(workspaceId, {content: data});
+	} catch (error) {
+		logError(error);
+	}
+}
+
+export const findWorkspaceByIdAndUpdateName = async (workspaceId: string, name: string) => {
+	try {
+		await Workspace.findByIdAndUpdate(workspaceId, {name});
 	} catch (error) {
 		logError(error);
 	}
@@ -48,6 +56,30 @@ export const getAllWorkspacesByUserId = async (userId: string) => {
 	} catch (error) {
 		logError(error);
 		return [];
+	}
+};
+
+export const getWorkspaceById = async (workspaceId: string) => {
+	try {
+		return await Workspace.findById(workspaceId, {content: 0, __v: 0, messages: 0, sharedFiles: 0, todos: 0});
+	} catch (error) {
+		logError(error);
+		return null;
+	}
+};
+
+/**
+ * @param workspaceId ID of workspace to delete.
+ * @param userId ID of a user.
+ */
+export const deleteWorkspaceById = async (workspaceId: string, userId: string) => {
+	try {
+		await Workspace.deleteOne({$and: [
+			{_id: workspaceId},
+			{createdBy: userId}
+		]}, {content: 0, __v: 0, members: 0, messages: 0, sharedFiles: 0, todos: 0});
+	} catch (error) {
+		logError(error);
 	}
 };
 
