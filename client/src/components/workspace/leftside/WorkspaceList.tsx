@@ -1,17 +1,23 @@
 import React, {useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
-import {ListItemButton, ListItem, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button} from '@mui/material';
+import {ListItemButton, ListItem, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Typography } from '@mui/material';
 import {useNavigate, useParams} from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete';
+import {Delete as DeleteIcon, Edit as EditIcon} from '@mui/icons-material';
 import {useAuth} from '../../../contexts/AuthContext';
-import {deleteWorkspace} from '../../../api/workspace';
+import {deleteWorkspace, renameWorkspace} from '../../../api/workspace';
+import theme from '../../../utils/theme';
 
 const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 	const {currentUser}: any = useAuth();
 	const {id: workspaceId}: any = useParams();
 	const navigate = useNavigate();
-	const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+	const [openDeleteWorkspaceDialog, setOpenDeleteWorkspaceDialog] = useState<boolean>(false);
 	const [workspaceToDelete, setWorkspaceToDelete] = useState<{ id: string, name: string } | null>(null);
+
+	const [openRenameWorkspaceDialog, setOpenRenameWorkspaceDialog] = useState<boolean>(false);
+	const [workspaceToRename, setWorkspaceToRename] = useState<{ id: string, name: string } | null>(null);
+	const [newName, setNewName] = useState<string | null>(null);
 
 	const handleRedirectAndReload = (newRoute: string) => {
 		navigate(newRoute);
@@ -20,11 +26,11 @@ const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 
 	const handleDeleteWorkspace = ({id, name}: {id: string, name: string}) => {
 		setWorkspaceToDelete({id, name});
-		setOpenDialog(true);
+		setOpenDeleteWorkspaceDialog(true);
 	};
 
 	const handleDeleteDialogClose = async (_deleteWorkspace: boolean) => {
-		setOpenDialog(false);
+		setOpenDeleteWorkspaceDialog(false);
 		if (!_deleteWorkspace) {
 			setWorkspaceToDelete(null);
 			return;
@@ -43,43 +49,108 @@ const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 		setWorkspaceToDelete(null);
 	};
 
-	return <>
-		{workspaces.map((workspace: any) => workspace._id !== workspaceId &&
-          <ListItem component="div" disablePadding key={uuidv4()}>
-              <ListItem>
-	              {workspace.createdBy === currentUser._id &&
-		               <IconButton aria-label="delete" title="delete this workspace" size="small"
-                              onClick={() => handleDeleteWorkspace({id:workspace._id, name:workspace.name})}>
-                      <DeleteIcon fontSize="inherit" color="error"/>
-                     </IconButton>
+	const handleRenameWorkspace = ({id, name}: {id: string, name: string}) => {
+		setWorkspaceToRename({id, name});
+		setOpenRenameWorkspaceDialog(true);
+	};
 
-					  }
-                  <ListItemButton
-                      onClick={() => handleRedirectAndReload(`/workspace/${workspace._id}`)}
-                  >
-	                  {workspace.name.slice(0, 15)}
-						</ListItemButton>
-              </ListItem>
-          </ListItem>)
+	const handleRenameDialogClose = async (_renameWorkspace: boolean) => {
+		if (!_renameWorkspace) {
+			setOpenRenameWorkspaceDialog(false);
+			setNewName(null);
+			setWorkspaceToRename(null);
+			return;
+		}
+
+		if (workspaceToRename == null || newName == null) {
+			setOpenRenameWorkspaceDialog(false);
+			return;
+		}
+
+		if (newName.length < 4 || newName.length > 25) {
+			return alert('Workspace name must be between 4 and 25 characters long!');
+		}
+
+		if (!(await renameWorkspace(workspaceToRename.id, newName))) {
+			setOpenRenameWorkspaceDialog(false);
+			setNewName(null);
+			setWorkspaceToRename(null);
+			return;
+		}
+
+		setOpenRenameWorkspaceDialog(false);
+
+		setWorkspaces(workspaces.map((workspace: any) => {
+			if (workspace._id === workspaceToRename.id) { workspace.name = newName; }
+			return workspace;
+		}));
+		setNewName(null);
+		setWorkspaceToRename(null);
+	};
+
+	return <>
+		{workspaces.map((workspace: any) => <ListItem component="div" disablePadding key={uuidv4()} sx={{backgroundColor: workspace._id === workspaceId ? theme.palette.secondary.main : ''}}>
+           <ListItem>
+              {workspace.createdBy === currentUser._id &&
+	               <IconButton aria-label="delete" title="delete this workspace" size="small"
+                           onClick={() => handleDeleteWorkspace({id:workspace._id, name:workspace.name})}>
+                   <DeleteIcon fontSize="inherit" color="error"/>
+                  </IconButton>
+				  }
+               <ListItemButton
+                   onClick={() => handleRedirectAndReload(`/workspace/${workspace._id}`)}
+               >
+                  {workspace.name.slice(0, 15)}
+					</ListItemButton>
+               <IconButton aria-label="delete" title="rename this workspace" size="small"
+                           onClick={() => handleRenameWorkspace({id:workspace._id, name:workspace.name})}>
+                   <EditIcon fontSize="inherit" color="primary"/>
+               </IconButton>
+           </ListItem>
+       </ListItem>)
 		}
 
 		<Dialog
-			open={openDialog}
+			open={openDeleteWorkspaceDialog}
 			onClose={() => {}}
-			aria-labelledby="alert-dialog-title"
-			aria-describedby="alert-dialog-description"
 		>
-			<DialogTitle id="alert-dialog-title">
+			<DialogTitle>
 				Are you sure to permanently delete chosen workspace?
 			</DialogTitle>
 			<DialogContent>
-				<DialogContentText id="alert-dialog-description">
+				<DialogContentText>
 					Chosen workspace: {workspaceToDelete?.name}
 				</DialogContentText>
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={() => handleDeleteDialogClose(false)} autoFocus>Cancel</Button>
 				<Button onClick={() => handleDeleteDialogClose(true)} color="error">Delete</Button>
+			</DialogActions>
+		</Dialog>
+
+		<Dialog
+			open={openRenameWorkspaceDialog}
+			onClose={() => {}}
+		>
+			<DialogTitle>
+				Are you sure to rename chosen workspace?
+			</DialogTitle>
+			<DialogContent>
+				<DialogContentText>
+					Chosen workspace: {workspaceToRename?.name}
+				</DialogContentText>
+				<TextField
+					required
+					fullWidth
+					label="Insert new name"
+
+					sx={{mt: 1}}
+					onChange={(e) => setNewName(e.target.value)}
+				/>
+			</DialogContent>
+			<DialogActions>
+				<Button onClick={() => handleRenameDialogClose(false)} autoFocus>Cancel</Button>
+				<Button onClick={() => handleRenameDialogClose(true)} color="success">Save</Button>
 			</DialogActions>
 		</Dialog>
 	</>;
