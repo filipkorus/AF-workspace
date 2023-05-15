@@ -113,7 +113,7 @@ export const addMemberToWorkspace = async (workspaceId: string, memberId: string
 export const removeMemberFromWorkspace = async (workspaceId: string, memberIdToRemove: string) => {
 	try {
 		await Workspace.findOneAndUpdate({_id: workspaceId}, {
-			pull:{members: {userId: memberIdToRemove}}
+			$pull:{members: {userId: memberIdToRemove}}
 		});
 	} catch (error) {
 		logError(error);
