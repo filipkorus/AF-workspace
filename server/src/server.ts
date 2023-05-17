@@ -127,8 +127,6 @@ io.on('connection', socket => {
 		socket.on('upload-file', (file, fileName, fileExtension, fileType, callback) => {
 			logInfo(`[socket] ${socket.user.name}: event = 'upload-file'`);
 
-			console.log(fileType);
-
 			// console.log(file); // <Buffer 25 50 44 ...>
 
 			const fileSize = Buffer.byteLength(file);
