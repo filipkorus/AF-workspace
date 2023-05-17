@@ -4,6 +4,7 @@ services:
     image: afworkspace:1.0
     volumes:
       - /var/data/AF-workspace/client/build/:/app/public
+      - /var/data/uploads/:/app/shared_files/
     restart: on-failure
     command: >
       bash -c "node src/index.js"
