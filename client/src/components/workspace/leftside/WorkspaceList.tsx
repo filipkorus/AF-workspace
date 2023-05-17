@@ -6,6 +6,7 @@ import {Delete as DeleteIcon, Edit as EditIcon} from '@mui/icons-material';
 import {useAuth} from '../../../contexts/AuthContext';
 import {deleteWorkspace, renameWorkspace} from '../../../api/workspace';
 import theme from '../../../utils/theme';
+import workspace from '../../Workspace';
 
 const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 	const {currentUser}: any = useAuth();
@@ -46,6 +47,11 @@ const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 		}
 
 		setWorkspaces(workspaces.filter((workspace: any) => workspace._id !== workspaceToDelete?.id));
+
+		if (workspaceId === workspaceToDelete?.id && workspaces.length > 0) {
+			handleRedirectAndReload(`/workspace/${workspaces[0]._id}`);
+		}
+
 		setWorkspaceToDelete(null);
 	};
 

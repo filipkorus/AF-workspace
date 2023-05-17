@@ -53,6 +53,13 @@ const QuillEditor = () => {
     useEffect(() => {
         if (!documentLoaded.current || quill == null) return;
 
+        if (isConnected) {
+            socket.emit('get-document', workspaceId);
+            setIsRoomJoined(true);
+        } else {
+            setIsRoomJoined(false);
+        }
+
         quill.enable(isConnected);
         quill.focus();
     }, [quill, isConnected]);
@@ -74,7 +81,7 @@ const QuillEditor = () => {
         if (socket == null || quill == null) return;
 
         const interval = setInterval(() => {
-            if (!(isRoomJoined && documentLoaded.current)) return;
+            if (!documentLoaded.current) return;
 
             socket.emit('save-document', quill.getContents());
         }, SAVE_DOCUMENT_INTERVAL_MS);

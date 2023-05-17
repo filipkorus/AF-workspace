@@ -33,9 +33,10 @@ import DragnDrop from "./DragnDrop";
 import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
-import {getUserWorkspaces, renameWorkspace} from '../../../api/workspace';
+import {getSharedFiles, getUserWorkspaces, renameWorkspace} from '../../../api/workspace';
 import AddUserToWorkspace from './AddUserToWorkspace';
 import RemoveUserFromWorkspace from './RemoveUserFromWorkspace';
+import {IWorkspaceSharedFile} from '../../../types';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
@@ -85,9 +86,16 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     	if (socket == null || !isRoomJoined) return;
 
         getUserWorkspaces()
-           .then((_workspaces: any) => {
-               setWorkspaces(_workspaces);
-           })
+           .then((_workspaces: any) => setWorkspaces(_workspaces))
+           .catch((error: any) => {});
+    }, [socket, isConnected, isRoomJoined]);
+
+    const [sharedFiles, setSharedFiles] = useState<IWorkspaceSharedFile[]>([]);
+    useEffect(() => {
+        if (socket == null || !isRoomJoined) return;
+
+        getSharedFiles(workspaceId as string)
+           .then((_sharedFiles: IWorkspaceSharedFile[]) => setSharedFiles(_sharedFiles))
            .catch((error: any) => {});
     }, [socket, isConnected, isRoomJoined]);
 
@@ -120,7 +128,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 '& .MuiDrawer-paper': {
                     width: drawerWidth,
                     boxSizing: 'border-box',
-                },
+                }
             }}
             variant="persistent"
             anchor="left"
@@ -144,7 +152,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <ListItemText primary="Your workspaces" />
                     {openSavedWork ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openSavedWork} timeout="auto" unmountOnExit>
+                <Collapse in={openSavedWork} timeout="auto">
                     <List component="div" disablePadding>
                         <WorkspaceList workspaces={workspaces} setWorkspaces={setWorkspaces} />
                     </List>
@@ -154,14 +162,12 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <ListItemIcon>
                         <AttachFileIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Drag n Drop" />
+                    <ListItemText primary="Drag & Drop" />
                     {openDragNDrop ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openDragNDrop} timeout="auto" unmountOnExit>
+                <Collapse in={openDragNDrop} timeout="auto">
                     <List component="div" disablePadding>
-                        <ListItemButton>
-                            <DragnDrop/>
-                        </ListItemButton>
+                        <DragnDrop sharedFiles={sharedFiles} setSharedFiles={setSharedFiles}/>
                     </List>
                 </Collapse>
 
@@ -172,7 +178,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <ListItemText primary="TODO" />
                     {openAddTask ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={openAddTask} timeout="auto" unmountOnExit>
+                <Collapse in={openAddTask} timeout="auto">
                     <List component="div" disablePadding>
                         <ListItemButton>
                             <ToDos/>
@@ -187,13 +193,12 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                     <ListItemText primary="Ask AI" />
                     {open ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
-                <Collapse in={open} timeout="auto" unmountOnExit>
+                <Collapse in={open} timeout="auto">
                     <List component="div" disablePadding>
-                        <ListItemButton>
-                            tu tez nie
-                        </ListItemButton>
+                        tu nic nie ma
                     </List>
                 </Collapse>
+
                 <ListItemButton onClick={() => {
                     navigate('/workspace');
                     window.location.reload();
@@ -208,7 +213,6 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
             <DrawerHeader/>
             {children}
         </Main>
-
     </>;
 }
 

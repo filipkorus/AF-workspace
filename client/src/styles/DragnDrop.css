@@ -1,0 +1,18 @@
+.dropzone {
+    text-align: center;
+    border: 1px solid #000;
+    border-radius: .5rem;
+}
+
+.dropzone:hover {
+    background-color: rgb(232,213,224);
+    cursor: pointer;
+}
+
+.dragover {
+    background-color: rgb(232,213,224);
+}
+
+.dropzone.dragging::before {
+    content: "Release to drop!";
+}

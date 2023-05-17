@@ -9,7 +9,7 @@ import {emailToLowerCase} from './middleware/emailToLowerCase';
 import router from './routes/main.router';
 import requestLogger from './middleware/requestLogger';
 import {requireSocketIOAuth} from "./middleware/requireAuth";
-import {logInfo} from "./utils/logger";
+import {logError, logInfo} from "./utils/logger";
 import {SUCCESS} from './helpers/responses/messages';
 import {
 	findWorkspaceByIdAndUpdateContent,
@@ -18,13 +18,16 @@ import {
 import {getMessages, saveMessage} from './services/workspace/message.service';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
+import {writeFile} from 'fs';
+import {removeSharedFile, saveSharedFile} from './services/workspace/sharedFile.service';
 
 const app = express();
 const httpServer = http.createServer(app);
 const io = require('socket.io')(httpServer, {
 	cors: {
 		origin: config.get<string[]>('ORIGIN')
-	}
+	},
+	maxHttpBufferSize: config.get<number>('MAX_FILE_UPLOAD_SIZE_IN_BYTES')
 });
 
 app.use(cors({
@@ -118,6 +121,84 @@ io.on('connection', socket => {
 			logInfo(`[socket] ${socket.user.name}: event = 'get-user-workspaces'`);
 			const workspaces = await getAllWorkspacesByUserId(socket.user.id);
 			socket.emit('load-user-workspaces', workspaces);
+		});
+
+		/* shared files */
+		socket.on('upload-file', (file, fileName, fileExtension, callback) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'upload-file'`);
+
+			// console.log(file); // <Buffer 25 50 44 ...>
+
+			const fileSize = Buffer.byteLength(file);
+			if (fileSize > config.get<number>('MAX_FILE_UPLOAD_SIZE_IN_BYTES')) {
+				return callback({
+					success: false,
+					msg: "File size exceeded",
+					uniqueFilename: null
+				});
+			}
+
+			if (!(config.get<string[]>('ALLOWED_FILE_EXTENSIONS').includes('*') || config.get<string[]>('ALLOWED_FILE_EXTENSIONS').includes(fileExtension))) {
+				return callback({
+					success: false,
+					msg: "File type is not allowed!",
+					uniqueFilename: null
+				});
+			}
+
+			const uniqueFilename = uuidv4() + (fileExtension == null ? '' : '.') + fileExtension;
+			const originalFilename = fileName;
+
+			writeFile(path.join(config.get<string>('WORKSPACE_SHARED_FILES_DIR'), uniqueFilename), file, async (err) => {
+				if (err == null) {
+					// save file info into db
+					await saveSharedFile({
+						workspaceId,
+						addedBy: socket.user.id,
+						originalFilename,
+						uniqueFilename
+					});
+
+					// emit changes to other rooms
+					socket.to(workspaceId).emit('receive-file', {
+						originalFilename,
+						uniqueFilename,
+						addedBy: {
+							_id: socket.user.id,
+							picture: socket.user.picture,
+							name: socket.user.name
+						},
+						addedAt: new Date(),
+						_id: uuidv4()
+					});
+				}
+
+				if (err) {
+					logError(err);
+				}
+
+				callback({
+					success: err == null,
+					msg: err ? "Server error occurred" : "File has been uploaded",
+					uniqueFilename: err == null ? uniqueFilename : null
+				});
+			});
+		});
+
+		socket.on('remove-file', async (uniqueFilename, callback) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'remove-file'`);
+
+			await removeSharedFile({
+				workspaceId,
+				uniqueFilename
+			});
+
+			socket.to(workspaceId).emit('remove-file', uniqueFilename);
+
+			return callback({
+				success: true,
+				msg: "File has been removed"
+			});
 		});
 	});
 });

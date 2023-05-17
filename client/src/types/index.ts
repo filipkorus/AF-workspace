@@ -24,3 +24,15 @@ export interface IWorkspaceMessage {
 	content: string,
 	createdAt: Date
 }
+
+export interface IWorkspaceSharedFile {
+	_id: string,
+	originalFilename: string,
+	uniqueFilename: string,
+	addedBy:  {
+		_id: string,
+		picture: string,
+		name: string
+	},
+	addedAt: Date
+}
