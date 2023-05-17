@@ -29,7 +29,6 @@ export interface IWorkspaceSharedFile {
 	_id: string,
 	originalFilename: string,
 	uniqueFilename: string,
-	fileType: string,
 	addedBy:  {
 		_id: string,
 		picture: string,

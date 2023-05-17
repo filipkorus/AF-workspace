@@ -124,10 +124,8 @@ io.on('connection', socket => {
 		});
 
 		/* shared files */
-		socket.on('upload-file', (file, fileName, fileExtension, fileType, callback) => {
+		socket.on('upload-file', (file, fileName, fileExtension, callback) => {
 			logInfo(`[socket] ${socket.user.name}: event = 'upload-file'`);
-
-			console.log(fileType);
 
 			// console.log(file); // <Buffer 25 50 44 ...>
 
@@ -158,8 +156,7 @@ io.on('connection', socket => {
 						workspaceId,
 						addedBy: socket.user.id,
 						originalFilename,
-						uniqueFilename,
-						fileType
+						uniqueFilename
 					});
 
 					// emit changes to other rooms
@@ -171,7 +168,6 @@ io.on('connection', socket => {
 							picture: socket.user.picture,
 							name: socket.user.name
 						},
-						fileType,
 						addedAt: new Date(),
 						_id: uuidv4()
 					});

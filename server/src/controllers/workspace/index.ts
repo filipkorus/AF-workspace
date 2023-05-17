@@ -150,21 +150,6 @@ export const GetSharedFileByUniqueNameHandler = async (req, res) => {
 		return NOT_FOUND(res);
 	}
 
-	// fs.readFile(pathToFile, (err, data) => {
-	// 	if (err) {
-	// 		SERVER_ERROR(res, {err});
-	// 	} else {
-	// 		const tmp  = data.toString().replace(/[“”‘’]/g,''); // Remove the non-standard characters
-	// 		console.log(fs.createReadStream(pathToFile))
-	// 		const base64EncodedFile = new Buffer(tmp).toString('base64');
-	//
-	// 		return SUCCESS(res, {
-	// 			base64File: base64EncodedFile,
-	// 			file: sharedFileDB
-	// 		});
-	// 	}
-	// });
-
 	res.sendFile(pathToFile);
 };
 
