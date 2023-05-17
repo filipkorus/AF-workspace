@@ -213,6 +213,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 			Click to choose a file or drag it here!
 			<input
 				type="file"
+				multiple={false}
 				accept={CONFIG.dragAndDrop.acceptFiles.join(', ')}
 				style={{display: 'none'}}
 				onChange={handleFileChange}
