@@ -87,7 +87,6 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 				_id: uuidv4(),
 				originalFilename: file.name,
 				uniqueFilename: uniqueFilename,
-				fileType: file.type,
 				addedBy:  {
 					_id: currentUser._id,
 					picture: currentUser.picture,
@@ -133,7 +132,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 	const uploadFile = (file: File, fileExtension: string) => new Promise((resolve, reject) => {
 		if (socket == null || !isRoomJoined) return reject('No connection...');
 
-		socket.emit('upload-file', file, file.name, fileExtension, file.type, (response: any) => {
+		socket.emit('upload-file', file, file.name, fileExtension, (response: any) => {
 			if (!response?.success) {
 				return reject({
 					msg: response?.msg,
@@ -213,6 +212,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 			Click to choose a file or drag it here!
 			<input
 				type="file"
+				multiple={false}
 				accept={CONFIG.dragAndDrop.acceptFiles.join(', ')}
 				style={{display: 'none'}}
 				onChange={handleFileChange}
