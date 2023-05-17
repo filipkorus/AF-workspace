@@ -1,5 +1,4 @@
 import api from './index';
-import {AxiosError} from 'axios';
 
 export const getUserWorkspaces = async () => {
 	try {
@@ -53,9 +52,19 @@ export const addUserToWorkspaceByEmail = async (workspaceId: string, email: stri
 export const removeUserFromWorkspaceByEmail = async (workspaceId: string, email: string) => {
 	try {
 		const {status, data} = await api.delete(`/workspace/${workspaceId}/member/${email}`);
-		console.log(status, data);
 		return status;
 	} catch (error: any) {
 		return error?.response?.status;
+	}
+};
+
+export const getSharedFiles = async (workspaceId: string) => {
+	if (workspaceId == null) return [];
+
+	try {
+		const {status, data} = await api.get(`/workspace/${workspaceId}/sharedFile`);
+		return data.sharedFiles;
+	} catch (error: any) {
+		return null;
 	}
 };

@@ -12,7 +12,12 @@ export default {
 	ORIGIN: process.env.ORIGIN?.split(';') || ['http://localhost:3000'],
 
 	STATIC_FILES_DIR: path.resolve(process.env.NODE_ENV === 'production' ?
-		'/app/public/' : 'C:\\Users\\filek7\\Desktop\\sem4\\JPWP\\AF-workspace\\client\\build\\'),
+		'/app/public/' : '..\\client\\build\\'),
+
+	WORKSPACE_SHARED_FILES_DIR: path.resolve(process.env.NODE_ENV === 'production' ?
+		'/app/shared_files/' : '.\\uploads\\'),
+	MAX_FILE_UPLOAD_SIZE_IN_BYTES: 20 * 1e6, // 20 MB
+	ALLOWED_FILE_EXTENSIONS: ['*'],
 
 	QUILL_DOCUMENT_DEFAULT_VALUE: '',
 

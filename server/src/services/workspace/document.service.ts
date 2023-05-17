@@ -1,7 +1,7 @@
 import config from 'config';
 import Workspace from '../../models/workspace';
 import {logError} from '../../utils/logger';
-import {FORBIDDEN} from '../../helpers/responses/messages';
+import {getSharedFiles, removeSharedFile} from './sharedFile.service';
 
 /**
  * Finds existing or creates new workspace in DB.
@@ -18,9 +18,10 @@ export const findOrCreateWorkspace = async (workspaceId: string, userId: string)
 			return await Workspace.create({ _id: workspaceId, content: config.get<string>('QUILL_DOCUMENT_DEFAULT_VALUE'), name: workspaceId, createdBy: userId });
 		}
 
-		if (workspace.createdBy === userId || workspace.members.map(member => member.userId).includes(userId)) {
+		if (await isUserMemberOrCreatorOfWorkspace(workspaceId, userId)) {
 			return workspace;
 		}
+
 		return;
 	} catch (error) {
 		logError(error);
@@ -62,7 +63,7 @@ export const getAllWorkspacesByUserId = async (userId: string) => {
 
 export const getWorkspaceById = async (workspaceId: string) => {
 	try {
-		return await Workspace.findById(workspaceId, {content: 0, __v: 0, messages: 0, sharedFiles: 0, todos: 0});
+		return await Workspace.findById(workspaceId, {content: 0, __v: 0, messages: 0, todos: 0});
 	} catch (error) {
 		logError(error);
 		return null;
@@ -75,6 +76,15 @@ export const getWorkspaceById = async (workspaceId: string) => {
  */
 export const deleteWorkspaceById = async (workspaceId: string, userId: string) => {
 	try {
+		const sharedFiles = await getSharedFiles(workspaceId, userId);
+
+		for (const sharedFile of sharedFiles) {
+			await removeSharedFile({
+				workspaceId,
+				uniqueFilename: sharedFile.uniqueFilename
+			});
+		}
+
 		await Workspace.deleteOne({$and: [
 			{_id: workspaceId},
 			{createdBy: userId}
