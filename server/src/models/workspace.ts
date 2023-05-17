@@ -42,7 +42,11 @@ interface IWorkspaceSharedFile {
 	_id: string,
 	originalFilename: string,
 	uniqueFilename: string,
-	addedBy: string,
+	addedBy:  {
+		_id: string,
+		picture: string,
+		name: string
+	},
 	addedAt: Date
 }
 
@@ -130,12 +134,13 @@ const workspaceSchema = new Schema<IWorkspace>({
 			required: true
 		},
 		uniqueFilename: {
-			type: Boolean,
-			default: false
+			type: String,
+			required: true
 		},
 		addedBy: {
 			type: String,
-			required: true
+			required: true,
+			ref: 'user'
 		},
 		addedAt: {
 			type: Date,

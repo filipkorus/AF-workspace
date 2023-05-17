@@ -1,7 +1,7 @@
 import {
 	AddWorkspaceMemberHandler,
-	DeleteWorkspaceHandler,
-	GetUserWorkspacesHandler, RemoveWorkspaceMemberHandler,
+	DeleteWorkspaceHandler, GetSharedFileByUniqueNameHandler, GetSharedFilesHandler,
+	GetUserWorkspacesHandler, RemoveWorkspaceMemberHandler, DeleteSharedFileByUniqueNameHandler,
 	RenameWorkspaceHandler
 } from '../../controllers/workspace';
 import {Router} from 'express';
@@ -14,8 +14,12 @@ router.get('/', GetUserWorkspacesHandler);
 
 router.delete('/:id', DeleteWorkspaceHandler);
 router.put('/:id', RenameWorkspaceHandler);
-router.post('/:id/member', AddWorkspaceMemberHandler);
 
+router.post('/:id/member', AddWorkspaceMemberHandler);
 router.delete('/:id/member/:email', RemoveWorkspaceMemberHandler);
+
+router.get('/:id/sharedFile', GetSharedFilesHandler);
+router.get('/:id/sharedFile/:uniqueFilename', GetSharedFileByUniqueNameHandler);
+router.delete('/:id/sharedFile/:uniqueFilename', DeleteSharedFileByUniqueNameHandler);
 
 export default router;

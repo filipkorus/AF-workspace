@@ -3,5 +3,9 @@ const production = true;
 export default {
 	production,
 	API_URL: production ? 'https://afworkspace.fkor.us' : 'http://localhost:5000',
-	GOOGLE_CLIENT_ID: '798597035392-k14pmbt80bf6tnjh0v7ruppvtkalqj8u.apps.googleusercontent.com'
+	GOOGLE_CLIENT_ID: '798597035392-k14pmbt80bf6tnjh0v7ruppvtkalqj8u.apps.googleusercontent.com',
+	dragAndDrop: {
+		acceptFiles: ['*'],
+		maxFileSizeInBytes: 20 * 1e6 // 20 MB
+	}
 };

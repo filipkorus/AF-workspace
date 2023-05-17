@@ -6,6 +6,15 @@ import {
 	isUserMemberOrCreatorOfWorkspace, removeMemberFromWorkspace
 } from '../../services/workspace/document.service';
 import {getUserByEmail} from '../../services/user/auth.service';
+import path from 'path';
+import config from 'config';
+import * as fs from 'fs';
+import {
+	getSharedFileByUniqueFilename,
+	getSharedFiles,
+	removeSharedFile
+} from '../../services/workspace/sharedFile.service';
+import {IWorkspaceSharedFile} from '../../models/workspace';
 
 export const GetUserWorkspacesHandler = async (req, res) => {
 	return SUCCESS(res, {workspaces: await getAllWorkspacesByUserId(res.locals.user.id)});
@@ -103,5 +112,86 @@ export const RemoveWorkspaceMemberHandler = async (req, res) => {
 	}
 
 	await removeMemberFromWorkspace(workspaceId, userToBeRemoved._id);
+	return SUCCESS(res);
+};
+
+export const GetSharedFileByUniqueNameHandler = async (req, res) => {
+	const {id: workspaceId, uniqueFilename} = req.params;
+
+	if (uniqueFilename == null || workspaceId == null) {
+		return BAD_REQUEST(res);
+	}
+
+	const isUserPermitted = await isUserMemberOrCreatorOfWorkspace(workspaceId, res.locals.user.id);
+
+	if (isUserPermitted == null) {
+		return FORBIDDEN(res);
+	}
+
+	if (!isUserPermitted) {
+		return FORBIDDEN(res);
+	}
+
+	const pathToFile = path.join(config.get<string>('WORKSPACE_SHARED_FILES_DIR'), uniqueFilename);
+
+	if (!fs.existsSync(pathToFile)) {
+		return NOT_FOUND(res);
+	}
+
+	return res.download(pathToFile);
+};
+
+export const GetSharedFilesHandler = async (req, res) => {
+	const {id: workspaceId} = req.params;
+
+	if (workspaceId == null) {
+		return BAD_REQUEST(res);
+	}
+
+	const isUserPermitted = await isUserMemberOrCreatorOfWorkspace(workspaceId, res.locals.user.id);
+
+	if (isUserPermitted == null) {
+		return FORBIDDEN(res);
+	}
+
+	if (!isUserPermitted) {
+		return FORBIDDEN(res);
+	}
+
+	const _sharedFilesFromDB = await getSharedFiles(workspaceId, res.locals.user.id);
+
+	const sharedFiles: IWorkspaceSharedFile[] = [];
+
+	_sharedFilesFromDB.reverse().forEach((sharedFile: IWorkspaceSharedFile) => {
+		const pathToFile = path.join(config.get<string>('WORKSPACE_SHARED_FILES_DIR'), sharedFile.uniqueFilename);
+		if (fs.existsSync(pathToFile)) {
+			sharedFiles.push(sharedFile);
+		}
+	});
+
+	return SUCCESS(res, {
+		sharedFiles
+	});
+};
+
+export const DeleteSharedFileByUniqueNameHandler = async (req, res) => {
+	const {id: workspaceId, uniqueFilename} = req.params;
+
+	if (workspaceId == null || uniqueFilename == null) {
+		return BAD_REQUEST(res);
+	}
+
+	const isUserPermitted = await isUserMemberOrCreatorOfWorkspace(workspaceId, res.locals.user.id);
+
+	if (isUserPermitted == null) {
+		return FORBIDDEN(res);
+	}
+
+	if (!isUserPermitted) {
+		return FORBIDDEN(res);
+	}
+
+	await removeSharedFile({workspaceId, uniqueFilename});
+
 	return SUCCESS(res);
 };
