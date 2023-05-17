@@ -1,4 +1,12 @@
-import {BAD_REQUEST, CONFLICT, FORBIDDEN, NOT_FOUND, RESPONSE, SUCCESS} from '../../helpers/responses/messages';
+import {
+	BAD_REQUEST,
+	CONFLICT,
+	FORBIDDEN,
+	NOT_FOUND,
+	RESPONSE,
+	SERVER_ERROR,
+	SUCCESS
+} from '../../helpers/responses/messages';
 import {
 	addMemberToWorkspace,
 	deleteWorkspaceById, findWorkspaceByIdAndUpdateName,
@@ -132,13 +140,32 @@ export const GetSharedFileByUniqueNameHandler = async (req, res) => {
 		return FORBIDDEN(res);
 	}
 
-	const pathToFile = path.join(config.get<string>('WORKSPACE_SHARED_FILES_DIR'), uniqueFilename);
+	const sharedFileDB = await getSharedFileByUniqueFilename(workspaceId, uniqueFilename);
+	if (sharedFileDB == null) {
+		return NOT_FOUND(res);
+	}
 
+	const pathToFile = path.join(config.get<string>('WORKSPACE_SHARED_FILES_DIR'), sharedFileDB.uniqueFilename);
 	if (!fs.existsSync(pathToFile)) {
 		return NOT_FOUND(res);
 	}
 
-	return res.download(pathToFile);
+	// fs.readFile(pathToFile, (err, data) => {
+	// 	if (err) {
+	// 		SERVER_ERROR(res, {err});
+	// 	} else {
+	// 		const tmp  = data.toString().replace(/[“”‘’]/g,''); // Remove the non-standard characters
+	// 		console.log(fs.createReadStream(pathToFile))
+	// 		const base64EncodedFile = new Buffer(tmp).toString('base64');
+	//
+	// 		return SUCCESS(res, {
+	// 			base64File: base64EncodedFile,
+	// 			file: sharedFileDB
+	// 		});
+	// 	}
+	// });
+
+	res.sendFile(pathToFile);
 };
 
 export const GetSharedFilesHandler = async (req, res) => {
