@@ -11,14 +11,12 @@ import config from 'config';
  * @param addedBy ID of user who uploaded a file.
  * @param originalFilename Original filename of file that user uploaded.
  * @param uniqueFilename Unique filename (with extension).
- * @param fileType 'type' field of File object.
  */
-export const saveSharedFile = async ({workspaceId, addedBy, originalFilename, uniqueFilename, fileType}: {
+export const saveSharedFile = async ({workspaceId, addedBy, originalFilename, uniqueFilename}: {
 	workspaceId: string,
 	addedBy: string,
 	originalFilename: string,
-	uniqueFilename: string,
-	fileType: string
+	uniqueFilename: string
 }) => {
 	if (!(await isUserMemberOrCreatorOfWorkspace(workspaceId, addedBy))) return;
 
@@ -28,7 +26,6 @@ export const saveSharedFile = async ({workspaceId, addedBy, originalFilename, un
 				sharedFiles: {
 					originalFilename,
 					uniqueFilename,
-					fileType,
 					addedBy
 				}
 			}
