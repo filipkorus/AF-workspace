@@ -11,6 +11,7 @@ interface IWorkspace {
 	messages?: IWorkspaceMessage[],
 	todos?: IWorkspaceTODO[],
 	sharedFiles?: IWorkspaceSharedFile[]
+	AIChat?: IWorkspaceAIChat[]
 }
 
 interface IWorkspaceMember {
@@ -43,6 +44,18 @@ interface IWorkspaceSharedFile {
 	originalFilename: string,
 	uniqueFilename: string,
 	addedBy:  {
+		_id: string,
+		picture: string,
+		name: string
+	},
+	addedAt: Date
+}
+
+interface IWorkspaceAIChat {
+	_id: string,
+	content: string,
+	role: string,
+	addedBy?: {
 		_id: string,
 		picture: string,
 		name: string
@@ -146,6 +159,28 @@ const workspaceSchema = new Schema<IWorkspace>({
 			type: Date,
 			default: new Date()
 		}
+	}],
+	AIChat: [{
+		_id: {
+			type: String,
+			default: uuidv4
+		},
+		content: {
+			type: String,
+			required: true
+		},
+		role: {
+			type: String,
+			required: true
+		},
+		addedBy: {
+			type: String,
+			ref: 'user'
+		},
+		addedAt: {
+			type: Date,
+			default: new Date()
+		}
 	}]
 });
 const Workspace = model('workspace', workspaceSchema);
@@ -156,6 +191,7 @@ export {
 	IWorkspaceSharedFile,
 	IWorkspaceMessage,
 	IWorkspaceMember,
+	IWorkspaceAIChat
 };
 
 export default Workspace;

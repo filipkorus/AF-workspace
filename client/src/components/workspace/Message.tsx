@@ -1,7 +1,12 @@
 import React from 'react';
 import theme from "../../utils/theme";
 
-const Message = ({content, timestamp, name, isMyMessage}: any) => {
+const Message = ({content, timestamp, name, isMyMessage}: {
+   content: string,
+   timestamp: string,
+   name: string,
+   isMyMessage: boolean
+}) => {
     return (
         <div style={{
             backgroundColor: isMyMessage ? theme.palette.secondary.main : theme.palette.primary.main,
@@ -12,9 +17,9 @@ const Message = ({content, timestamp, name, isMyMessage}: any) => {
             marginBottom: "5px",
             padding: "5px"
         }}>
-            <div style={{fontSize: ".7rem", color: isMyMessage || 'whitesmoke'}}>{name}</div>
+            <div style={{fontSize: ".7rem", color: isMyMessage ? '' : 'whitesmoke'}}>{name}</div>
             {content}
-            <div style={{fontSize: ".6rem", textAlign: "right", color: isMyMessage || 'whitesmoke'}}>{timestamp}</div>
+            <div style={{fontSize: ".6rem", textAlign: "right", color: isMyMessage ? '' : 'whitesmoke'}}>{timestamp}</div>
         </div>
 
     );

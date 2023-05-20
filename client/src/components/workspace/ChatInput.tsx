@@ -6,7 +6,10 @@ import {useSocket} from '../../contexts/SocketContext';
 
 
 
-const ChatInput = ({handleSendMessage}: { handleSendMessage: (text: string) => void }) => {
+const ChatInput = ({handleSendMessage, placeholder}: {
+    handleSendMessage: (text: string) => void,
+    placeholder?: string
+}) => {
     const {isConnected}: any = useSocket();
     const [msg, setMsg] = useState("");
     const sendChat = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -32,7 +35,7 @@ const ChatInput = ({handleSendMessage}: { handleSendMessage: (text: string) => v
             <div className="input-container" style={{ display: "flex",justifyContent:"space-between"}}>
                 <textarea
                     style={{padding:"5px",marginLeft: "1px", backgroundColor: "lavenderblush",borderTopLeftRadius:"10px",borderBottomLeftRadius: "10px"}}
-                    placeholder="Chat with your mates"
+                    placeholder={placeholder || "Chat with your mates"}
                     onChange={(e) => setMsg(e.target.value)}
                     value={msg}
                     onKeyDown={(event) => sendChat(event)}
