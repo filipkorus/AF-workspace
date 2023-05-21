@@ -37,6 +37,7 @@ import {getSharedFiles, getUserWorkspaces, renameWorkspace} from '../../../api/w
 import AddUserToWorkspace from './AddUserToWorkspace';
 import RemoveUserFromWorkspace from './RemoveUserFromWorkspace';
 import {IWorkspaceSharedFile} from '../../../types';
+import AIChat from './AIChat';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
@@ -195,7 +196,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 </ListItemButton>
                 <Collapse in={open} timeout="auto">
                     <List component="div" disablePadding>
-                        tu nic nie ma
+                        <AIChat/>
                     </List>
                 </Collapse>
 
