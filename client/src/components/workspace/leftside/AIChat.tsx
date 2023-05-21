@@ -141,7 +141,7 @@ const AIChat = () => {
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText>
-					{/*Chosen workspace: {workspaceToDelete?.name}*/}
+					New thread will be created.
 				</DialogContentText>
 			</DialogContent>
 			<DialogActions>
