@@ -20,6 +20,13 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {writeFile} from 'fs';
 import {removeSharedFile, saveSharedFile} from './services/workspace/sharedFile.service';
+import {
+	createAIChatCompletion,
+	getAIChatMessages,
+	removeAIChatMessages,
+	saveAIChatMessage
+} from './services/workspace/aichat.service';
+import {IWorkspaceAIChat} from './models/workspace';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -200,12 +207,83 @@ io.on('connection', socket => {
 				msg: "File has been removed"
 			});
 		});
+
+		/* AI Chat */
+		socket.on('get-aichat-messages', async () => {
+			logInfo(`[socket] ${socket.user.name}: event = 'get-aichat-messages'`);
+			const messages = await getAIChatMessages(workspaceId);
+
+			if (messages == null) {
+				return;
+			}
+
+			socket.emit('load-aichat-messages', messages);
+		});
+
+		socket.on('send-aichat-message', async (msg) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'send-aichat-message'`);
+			socket.to(workspaceId).emit('receive-aichat-message', {
+				_id: uuidv4(),
+				content: msg,
+				role: 'user',
+				author: {
+					_id: socket.user.id,
+					picture: socket.user.picture,
+					name: socket.user.name
+				},
+				addedAt: new Date(),
+			});
+
+			await saveAIChatMessage({
+				workspaceId,
+				content: msg,
+				role: 'user',
+				userId: socket.user.id
+			});
+
+			const messages = await getAIChatMessages(workspaceId);
+
+			const completion = await createAIChatCompletion(messages.map((msg: IWorkspaceAIChat) => {
+				return {
+					role: msg.role,
+					content: msg.content
+				};
+			}));
+
+			if (completion == null) {
+				return socket.emit('workspace-error', {
+					msg: 'OpenAI API error',
+					error: 'OpenAI API'
+				});
+			}
+
+			// save chat completion
+			await saveAIChatMessage({
+				workspaceId,
+				content: completion,
+				role: 'assistant'
+			});
+
+			io.to(workspaceId).emit('receive-aichat-message', {
+				_id: uuidv4(),
+				content: completion,
+				role: 'assistant',
+				addedAt: new Date()
+			});
+		});
+
+		socket.on('clear-aichat', async () => {
+			logInfo(`[socket] ${socket.user.name}: event = 'clear-aichat'`);
+
+			await removeAIChatMessages(workspaceId);
+
+			socket.to(workspaceId).emit('receive-clear-aichat');
+		});
 	});
 });
 
 // TODO: remove in production
-app.get('/mdb', async (req, res) => {
-
+app.get('/test', async (req, res) => {
 	return SUCCESS(res, {
 		testing: true
 	})
@@ -215,5 +293,4 @@ app.get('/mdb', async (req, res) => {
 app.use('/', express.static(config.get<string>("STATIC_FILES_DIR")));
 app.get('*', (req, res) => res.sendFile(path.resolve(config.get<string>("STATIC_FILES_DIR"), 'index.html')))
 
-// export default app;
 export default httpServer;

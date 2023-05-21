@@ -54,7 +54,7 @@ export const getAllWorkspacesByUserId = async (userId: string) => {
 		return await Workspace.find({$or: [
 			{createdBy: userId},
 			{members: {$elemMatch:{userId:{$in:[userId]}}}}
-		]}, {content: 0, __v: 0, members: 0, messages: 0, sharedFiles: 0, todos: 0});
+		]}, {content: 0, __v: 0, members: 0, messages: 0, AIChat: 0, sharedFiles: 0, todos: 0});
 	} catch (error) {
 		logError(error);
 		return [];
@@ -63,7 +63,7 @@ export const getAllWorkspacesByUserId = async (userId: string) => {
 
 export const getWorkspaceById = async (workspaceId: string) => {
 	try {
-		return await Workspace.findById(workspaceId, {content: 0, __v: 0, messages: 0, todos: 0});
+		return await Workspace.findById(workspaceId, {content: 0, __v: 0, messages: 0, AIChat: 0, todos: 0});
 	} catch (error) {
 		logError(error);
 		return null;
@@ -88,7 +88,7 @@ export const deleteWorkspaceById = async (workspaceId: string, userId: string) =
 		await Workspace.deleteOne({$and: [
 			{_id: workspaceId},
 			{createdBy: userId}
-		]}, {content: 0, __v: 0, members: 0, messages: 0, sharedFiles: 0, todos: 0});
+		]}, {content: 0, __v: 0, members: 0, messages: 0, AIChat: 0, sharedFiles: 0, todos: 0});
 	} catch (error) {
 		logError(error);
 	}

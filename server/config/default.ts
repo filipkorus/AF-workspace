@@ -25,6 +25,8 @@ export default {
 
 	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
 
+	OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+
 	ACCESS_TOKEN: process.env.ACCESS_TOKEN,
 	ACCESS_TOKEN_TTL: process.env.ACCESS_TOKEN_TTL,
 

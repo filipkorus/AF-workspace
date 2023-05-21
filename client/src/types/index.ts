@@ -25,6 +25,18 @@ export interface IWorkspaceMessage {
 	createdAt: Date
 }
 
+export interface IWorkspaceAIChat {
+	_id: string,
+	content: string,
+	role: 'user' | 'assistant',
+	author?: {
+		_id: string,
+		picture: string,
+		name: string
+	},
+	addedAt: Date
+}
+
 export interface IWorkspaceSharedFile {
 	_id: string,
 	originalFilename: string,

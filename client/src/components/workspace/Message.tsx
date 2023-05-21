@@ -1,9 +1,15 @@
 import React from 'react';
 import theme from "../../utils/theme";
+import {Box} from '@mui/material';
 
-const Message = ({content, timestamp, name, isMyMessage}: any) => {
+const Message = ({content, timestamp, name, isMyMessage}: {
+   content: string,
+   timestamp: string,
+   name: string,
+   isMyMessage: boolean
+}) => {
     return (
-        <div style={{
+        <Box style={{
             backgroundColor: isMyMessage ? theme.palette.secondary.main : theme.palette.primary.main,
             borderRadius: "10px",
             wordBreak: 'break-word',
@@ -12,10 +18,10 @@ const Message = ({content, timestamp, name, isMyMessage}: any) => {
             marginBottom: "5px",
             padding: "5px"
         }}>
-            <div style={{fontSize: ".7rem", color: isMyMessage || 'whitesmoke'}}>{name}</div>
+            <div style={{fontSize: ".7rem", color: isMyMessage ? '' : 'whitesmoke'}}>{name}</div>
             {content}
-            <div style={{fontSize: ".6rem", textAlign: "right", color: isMyMessage || 'whitesmoke'}}>{timestamp}</div>
-        </div>
+            <div style={{fontSize: ".6rem", textAlign: "right", color: isMyMessage ? '' : 'whitesmoke'}}>{timestamp}</div>
+        </Box>
 
     );
 };

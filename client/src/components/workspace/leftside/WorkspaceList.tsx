@@ -97,17 +97,17 @@ const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 	return <>
 		{workspaces.map((workspace: any) => <ListItem component="div" disablePadding key={uuidv4()} sx={{backgroundColor: workspace._id === workspaceId ? theme.palette.secondary.main : ''}}>
            <ListItem>
-              {workspace.createdBy === currentUser._id &&
-	               <IconButton aria-label="delete" title="delete this workspace" size="small"
-                           onClick={() => handleDeleteWorkspace({id:workspace._id, name:workspace.name})}>
-                   <DeleteIcon fontSize="inherit" color="error"/>
-                  </IconButton>
-				  }
+              <IconButton aria-label="delete"
+                          title={workspace.createdBy === currentUser._id ? 'delete this workspace' : 'you are not the owner of this workspace'}
+                          size="small"
+                          onClick={workspace.createdBy === currentUser._id ? () => handleDeleteWorkspace({id:workspace._id, name:workspace.name}) : () => alert('you are not the owner of this workspace')}>
+                   <DeleteIcon fontSize="inherit" color={workspace.createdBy === currentUser._id ? 'error' : 'disabled'}/>
+               </IconButton>
                <ListItemButton
                    onClick={() => handleRedirectAndReload(`/workspace/${workspace._id}`)}
                    disabled={workspace._id === workspaceId}
                >
-                  {workspace.name.slice(0, 14)}
+                  {workspace.name.slice(0, 13) + (workspace.name.length > 13 ? '...' : '')}
 					</ListItemButton>
                <IconButton aria-label="rename" title="rename this workspace" size="small"
                            onClick={() => handleRenameWorkspace({id:workspace._id, name:workspace.name})}>
