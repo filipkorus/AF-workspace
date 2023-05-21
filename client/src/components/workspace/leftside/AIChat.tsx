@@ -3,10 +3,21 @@ import ChatInput from '../ChatInput';
 import {IWorkspaceAIChat, IWorkspaceMessage} from '../../../types';
 import Message from '../Message';
 import formatDate from '../../../utils/formatDate';
-import {Box} from '@mui/material';
+import {
+	Box,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	IconButton
+} from '@mui/material';
 import {useAuth} from '../../../contexts/AuthContext';
 import {useSocket} from '../../../contexts/SocketContext';
 import {useParams} from 'react-router-dom';
+import {Delete as DeleteIcon} from '@mui/icons-material';
+import {deleteWorkspace} from '../../../api/workspace';
 
 const AIChat = () => {
 	const [messages, setMessages] = useState<IWorkspaceAIChat[]>([]);
@@ -14,6 +25,8 @@ const AIChat = () => {
 	const {socket, isConnected, isRoomJoined}: any = useSocket();
 	const {id: workspaceId} = useParams();
 	const messageEndRef = useRef<HTMLDivElement>(null);
+
+	const [openClearAIChatDialog, setOpenClearAIChatDialog] = useState<boolean>(false);
 
 	const handleSendMessage = (msg: string) => {
 		socket.emit('send-aichat-message', msg);
@@ -56,20 +69,61 @@ const AIChat = () => {
 		};
 	}, [socket, messages]);
 
+	/* clearing chat history */
+	useEffect(() => {
+		if (socket == null) return;
+
+		const handler = () => {
+			setMessages([]);
+		};
+
+		socket.on('receive-clear-aichat', handler);
+
+		return () => {
+			socket.off('receive-clear-aichat', handler);
+		};
+	}, [socket, messages]);
+
 	useEffect(() => {
 		messageEndRef.current?.scrollIntoView({behavior: "auto"});
 	}, [messages]);
+
+	const handleClearAIChatDialogClose = async (_clearAIChat: boolean) => {
+		setOpenClearAIChatDialog(false);
+		if (!_clearAIChat) {
+			return;
+		}
+
+		if (socket == null || !isRoomJoined) {
+			return alert('Connection error');
+		}
+
+		socket.emit('clear-aichat');
+
+		setMessages([]);
+	};
 
 	return <>
 		<Box sx={{
 			maxHeight: '35dvh',
 			overflowY: 'auto',
-			ml: .6
+			ml: .6,
+			mt: .7
 		}}>
 			{messages.map((msg: IWorkspaceAIChat, index) => (
 				<Message name={msg.role === 'assistant' ? 'AI': msg.author?.name as string} content={msg.content} timestamp={formatDate(msg.addedAt)}
 				         key={index} isMyMessage={msg.role === 'user' && msg.author?._id as string === currentUser._id}/>
 			))}
+			{messages.length > 0 &&
+             <Button
+                 variant="outlined"
+                 size="small"
+                 color="error"
+                 sx={{mt:.7, mr: .5, width: '98%'}}
+                 onClick={() => setOpenClearAIChatDialog(true)}
+             >
+                 Clear chat
+             </Button>}
 			<div ref={messageEndRef}/>
 		</Box>
 		<ChatInput
@@ -77,6 +131,24 @@ const AIChat = () => {
 			placeholder="Send a message"
 			sx={{m: 1}}
 		/>
+
+		<Dialog
+			open={openClearAIChatDialog}
+			onClose={() => {}}
+		>
+			<DialogTitle>
+				Are you sure to permanently clear the chat history?
+			</DialogTitle>
+			<DialogContent>
+				<DialogContentText>
+					{/*Chosen workspace: {workspaceToDelete?.name}*/}
+				</DialogContentText>
+			</DialogContent>
+			<DialogActions>
+				<Button onClick={() => handleClearAIChatDialogClose(false)} autoFocus>Cancel</Button>
+				<Button onClick={() => handleClearAIChatDialogClose(true)} color="error">Clear</Button>
+			</DialogActions>
+		</Dialog>
 	</>;
 };
 
