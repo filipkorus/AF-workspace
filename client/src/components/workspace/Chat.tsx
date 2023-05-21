@@ -70,7 +70,7 @@ const Chat = () => {
 				marginLeft: "2px",
 				marginRight: "2px",
 				maxHeight: "79%",
-				overflowY: "auto",
+				overflowY: "auto"
 			}}>
 				{messages.map((message: IWorkspaceMessage, index) => (
 					<Message name={message.author.name} content={message.content} timestamp={formatDate(message.createdAt)}

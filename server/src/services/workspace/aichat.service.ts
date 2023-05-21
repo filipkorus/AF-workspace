@@ -1,5 +1,5 @@
 import config from 'config';
-import Workspace, {IWorkspaceMessage} from '../../models/workspace';
+import Workspace, {IWorkspaceAIChat} from '../../models/workspace';
 import {logError} from '../../utils/logger';
 import {isUserMemberOrCreatorOfWorkspace} from './document.service';
 import {Configuration, OpenAIApi} from 'openai';
@@ -7,24 +7,22 @@ import {Configuration, OpenAIApi} from 'openai';
 const configuration = new Configuration({ apiKey: config.get<string>('OPENAI_API_KEY') });
 const openai = new OpenAIApi(configuration);
 
-export const createChatCompletion = async ({messages}: {
-	messages: {
-		role: 'user' | 'assistant',
-		content: string
-	}[]
-}) => {
+export const createAIChatCompletion = async (messages: {
+	role: 'user' | 'assistant',
+	content: string
+}[]) => {
 	try {
 		const completion = await openai.createChatCompletion({
-			model: "gpt-3.5-turbo",
-			messages: messages,
+			model: 'gpt-3.5-turbo',
+			messages
 		});
 
 		return completion.data.choices[0].message.content;
 
 	} catch (error) {
+		logError('OpenAI API error');
 		if (error?.response) {
-			logError(error.response?.status);
-			logError(error.response?.data);
+			console.log(error.response?.data);
 		} else {
 			logError(error?.message);
 		}
@@ -34,13 +32,13 @@ export const createChatCompletion = async ({messages}: {
 };
 
 /**
- * Adds new message to a workspace.
+ * Adds new AI Chat message to a workspace.
  * @param workspaceId ID of workspace.
  * @param userId ID of user who sent a message.
  * @param content Content of the message.
  * @param role 'user' if message was sent by user or 'assistant' if message was sent by openai
  */
-export const saveMessage = async ({workspaceId, content, role, userId}: {
+export const saveAIChatMessage = async ({workspaceId, content, role, userId}: {
 	workspaceId: string,
 	content: string,
 	userId?: string,
@@ -75,32 +73,40 @@ export const saveMessage = async ({workspaceId, content, role, userId}: {
 	}
 };
 
-export const getMessages = async (workspaceId: string, userId: string, n: number=null) => {
+/**
+ * Removes all AI Chat messages from a workspace.
+ * @param workspaceId ID of workspace
+ */
+export const removeAIChatMessages = async (workspaceId: string) => {
+	try {
+		await Workspace.findOneAndUpdate({ _id: workspaceId }, { $set: { AIChat: [] } });
+	} catch (error) {
+		logError(error);
+	}
+};
+
+export const getAIChatMessages = async (workspaceId: string, n: number=null) => {
 	try {
 		if (workspaceId == null) return null;
 
 		const workspace = (n == null ?
-			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, sharedFiles: 0, todos: 0}).populate({
-				path: 'messages.userId',
+			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, messages: 0, members: 0, sharedFiles: 0, todos: 0}).populate({
+				path: 'AIChat.addedBy',
 				select: 'name picture'
 			}) :
-			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, sharedFiles: 0, todos: 0}).limit(n).populate({
-				path: 'messages.userId',
+			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, messages: 0, members: 0, sharedFiles: 0, todos: 0}).limit(n).populate({
+				path: 'AIChat.addedBy',
 				select: 'name picture'
 			})
 		);
 
-		if (await isUserMemberOrCreatorOfWorkspace(workspaceId, userId)) {
-			return workspace.messages.map((message: any) => {
-				const {userId: author, content, createdAt, _id} = message;
-				return {
-					content, createdAt, _id,
-					author
-				} as IWorkspaceMessage;
-			});
-		}
-
-		return null;
+		return workspace.AIChat.map((message: any) => {
+			const {addedBy: author, content, role, addedAt, _id} = message;
+			return {
+				content, addedAt, _id,
+				author, role
+			} as IWorkspaceAIChat;
+		});
 	} catch (error) {
 		logError(error);
 		return null;

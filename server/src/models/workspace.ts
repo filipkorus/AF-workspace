@@ -54,8 +54,8 @@ interface IWorkspaceSharedFile {
 interface IWorkspaceAIChat {
 	_id: string,
 	content: string,
-	role: string,
-	addedBy?: {
+	role: 'user' | 'assistant',
+	author?: {
 		_id: string,
 		picture: string,
 		name: string

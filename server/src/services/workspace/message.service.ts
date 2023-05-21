@@ -30,11 +30,11 @@ export const getMessages = async (workspaceId: string, userId: string, n: number
 		if (workspaceId == null) return null;
 
 		const workspace = (n == null ?
-			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, sharedFiles: 0, todos: 0}).populate({
+			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, AIChat: 0, sharedFiles: 0, todos: 0}).populate({
 				path: 'messages.userId',
 				select: 'name picture'
 			}) :
-			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, sharedFiles: 0, todos: 0}).limit(n).populate({
+			await Workspace.findById(workspaceId, {_id: 0, createdAt: 0, content: 0, __v: 0, AIChat: 0, sharedFiles: 0, todos: 0}).limit(n).populate({
 				path: 'messages.userId',
 				select: 'name picture'
 			})
