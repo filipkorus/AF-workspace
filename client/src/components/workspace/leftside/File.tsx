@@ -1,14 +1,15 @@
 import React from 'react';
-import {Box, Link} from '@mui/material';
+import {Box, IconButton, Link} from '@mui/material';
 import theme from '../../../utils/theme';
 import {IWorkspaceSharedFile} from '../../../types';
 import {ReactJSXElement} from '@emotion/react/types/jsx-namespace';
 import {useParams} from 'react-router-dom';
 import api from '../../../api';
+import {Delete as DeleteIcon} from '@mui/icons-material';
 
-const File = ({file, isUploading, children}: {
+const File = ({file, handleRemoveFile, isUploading}: {
 	file: IWorkspaceSharedFile,
-	children: ReactJSXElement,
+	handleRemoveFile: (file: IWorkspaceSharedFile) => void
 	isUploading?: boolean
 }) => {
 	const {id: workspaceId} = useParams();
@@ -45,7 +46,10 @@ const File = ({file, isUploading, children}: {
 		overflowX: 'auto'
 	}}>
 		<Box>
-			{children}
+			<IconButton aria-label="delete" title={`delete ${file.originalFilename}`} size="small"
+			            onClick={() => handleRemoveFile(file)}>
+				<DeleteIcon fontSize="inherit" color="error"/>
+			</IconButton>
 			<Link
 				onClick={() => downloadFile(file)}
 				title={`download ${file.originalFilename}`}
@@ -53,7 +57,6 @@ const File = ({file, isUploading, children}: {
 			>
 				{file.originalFilename.slice(0, 15) + (file.originalFilename.length > 15 ?'...':'')}
 			</Link>
-			{/*{uniqueFilename}*/}
 		</Box>
 	</Box>;
 };

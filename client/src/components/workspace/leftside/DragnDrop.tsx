@@ -1,14 +1,10 @@
-import React, {DragEventHandler, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
 	Box,
 	Button, Dialog, DialogActions,
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
-	Grid, IconButton,
-	Paper,
-	TextField,
-	Typography
 } from '@mui/material';
 import '../../../styles/DragnDrop.css';
 import CONFIG from '../../../config/index';
@@ -18,7 +14,6 @@ import {useSocket} from '../../../contexts/SocketContext';
 import {IWorkspaceSharedFile} from '../../../types';
 import getFileExtension from '../../../utils/getFileExtension';
 import {useAuth} from '../../../contexts/AuthContext';
-import {Delete as DeleteIcon} from '@mui/icons-material';
 
 const DragnDrop = ({sharedFiles, setSharedFiles}: {
 	sharedFiles: IWorkspaceSharedFile[],
@@ -32,18 +27,10 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 
 	const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
-	const [files, setFiles] = useState<IWorkspaceSharedFile[]>([]);
-	const [isUploading, setIsUploading] = useState<boolean>(false);
-
 	const fileListBeginningRef = useRef<HTMLDivElement>(null);
 
 	const [fileToRemove, setFileToRemove] = useState<IWorkspaceSharedFile | null>(null);
 	const [openRemoveFileDialog, setOpenRemoveFileDialog] = useState<boolean>(false);
-
-	useEffect(() => {
-		if (sharedFiles == null) return;
-		setFiles(sharedFiles);
-	}, [sharedFiles]);
 
 	const handleFileChange = async (event: any) => {
 		const file = event.target.files[0];
@@ -79,11 +66,9 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 			return alert(`This file type is not allowed! Allowed file types: ${CONFIG.dragAndDrop.acceptFiles.join(', ')}.`);
 		}
 
-		setIsUploading(true);
-
 		try {
 			const {msg, uniqueFilename}: any = await uploadFile(file, fileExtension);
-			setFiles([{
+			setSharedFiles([{
 				_id: uuidv4(),
 				originalFilename: file.name,
 				uniqueFilename: uniqueFilename,
@@ -93,12 +78,10 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 					name: currentUser.name
 				},
 				addedAt: new Date()
-			}, ...files]);
+			}, ...sharedFiles]);
 		} catch (error) {
 			alert((error as any).msg || 'Server error');
 		}
-
-		setIsUploading(false);
 	};
 
 	const handleRemoveFile = async (fileToRemove: IWorkspaceSharedFile) => {
@@ -120,7 +103,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		try {
 			const {msg}: any = await removeFile(fileToRemove.uniqueFilename);
 			setSharedFiles(
-				files.filter((file: IWorkspaceSharedFile) => file.uniqueFilename !== fileToRemove.uniqueFilename)
+				sharedFiles.filter((file: IWorkspaceSharedFile) => file.uniqueFilename !== fileToRemove.uniqueFilename)
 			);
 		} catch (error) {
 			alert((error as any).msg || 'Server error');
@@ -166,7 +149,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		if (socket == null) return;
 
 		const handler = (sharedFile: any) => {
-			setFiles([sharedFile, ...files]);
+			setSharedFiles([sharedFile, ...sharedFiles]);
 		};
 
 		socket.on('receive-file', handler);
@@ -174,7 +157,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		return () => {
 			socket.off('receive-file', handler);
 		};
-	}, [socket, files]);
+	}, [socket, sharedFiles]);
 
 	/* removing shared files */
 	useEffect(() => {
@@ -182,7 +165,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 
 		const handler = (uniqueFilename: string) => {
 			setSharedFiles(
-				files.filter((file: IWorkspaceSharedFile) => file.uniqueFilename !== uniqueFilename)
+				sharedFiles.filter((file: IWorkspaceSharedFile) => file.uniqueFilename !== uniqueFilename)
 			);
 		};
 
@@ -191,7 +174,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		return () => {
 			socket.off('remove-file', handler);
 		};
-	}, [socket, files]);
+	}, [socket, sharedFiles]);
 
 	useEffect(() => {
 		fileListBeginningRef.current?.scrollIntoView({behavior: "auto"}); // przewijanie na poczatek końca diva
@@ -223,14 +206,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 
 		<Box sx={{maxHeight: '30dvh', overflowY: 'auto'}}>
 			<div ref={fileListBeginningRef}/>
-			{/* pusty div użyty do ustawienia referencji */}
-			{files?.map((file: IWorkspaceSharedFile) => <File key={uuidv4()} file={file}>
-					<IconButton aria-label="delete" title={`delete ${file.originalFilename}`} size="small"
-					            onClick={() => handleRemoveFile(file)}>
-						<DeleteIcon fontSize="inherit" color="error"/>
-					</IconButton>
-				</File>
-				)}
+			{sharedFiles?.map((file: IWorkspaceSharedFile) => <File key={uuidv4()} file={file} handleRemoveFile={(file: IWorkspaceSharedFile) => handleRemoveFile(file)} />)}
 		</Box>
 
 		<Dialog
