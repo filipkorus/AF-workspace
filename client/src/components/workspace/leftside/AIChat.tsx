@@ -127,7 +127,7 @@ const AIChat = () => {
 			<div ref={messageEndRef}/>
 		</Box>
 		<ChatInput
-			handleSendMessage={(text) => handleSendMessage(text)}
+			handleSubmit={(text) => handleSendMessage(text)}
 			placeholder="Send a message"
 			sx={{m: 1}}
 		/>

@@ -35,7 +35,11 @@ interface IWorkspaceTODO {
 	_id: string,
 	content: string,
 	isDone: boolean,
-	addedBy: string,
+	addedBy: {
+		_id: string,
+		picture: string,
+		name: string
+	},
 	addedAt: Date
 }
 
@@ -120,7 +124,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 			type: String,
 			default: uuidv4
 		},
-		addedBy: {
+		content: {
 			type: String,
 			required: true
 		},
@@ -128,9 +132,10 @@ const workspaceSchema = new Schema<IWorkspace>({
 			type: Boolean,
 			default: false
 		},
-		content: {
+		addedBy: {
 			type: String,
-			required: true
+			required: true,
+			ref: 'user'
 		},
 		addedAt: {
 			type: Date,

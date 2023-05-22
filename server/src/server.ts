@@ -26,7 +26,8 @@ import {
 	removeAIChatMessages,
 	saveAIChatMessage
 } from './services/workspace/aichat.service';
-import {IWorkspaceAIChat} from './models/workspace';
+import {IWorkspaceAIChat, IWorkspaceTODO} from './models/workspace';
+import {deleteToDo, getToDos, markToDoAsDoneOrUndone, saveToDo} from './services/workspace/todo.service';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -278,6 +279,65 @@ io.on('connection', socket => {
 			await removeAIChatMessages(workspaceId);
 
 			socket.to(workspaceId).emit('receive-clear-aichat');
+		});
+
+		/* ToDos */
+		socket.on('get-todos', async () => {
+			logInfo(`[socket] ${socket.user.name}: event = 'get-todos'`);
+			const todos = await getToDos(workspaceId);
+
+			if (todos == null) {
+				return;
+			}
+
+			socket.emit('load-todos', todos);
+		});
+
+		socket.on('create-todo', async (content: string) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'create-todo'`);
+
+			const todo = await saveToDo({
+				workspaceId,
+				content,
+				addedBy: socket.user.id
+			});
+
+			if (todo == null) return;
+
+			io.to(workspaceId).emit('receive-create-todo', {
+				_id: todo._id,
+				content: todo.content,
+				isDone: todo.isDone,
+				addedBy: {
+					_id: socket.user.id,
+					picture: socket.user.picture,
+					name: socket.user.name
+				},
+				addedAt: todo.addedAt
+			} as IWorkspaceTODO);
+		});
+
+		socket.on('mark-todo', async (todoId: string, isDone: boolean) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'mark-todo'`);
+
+			await markToDoAsDoneOrUndone({
+				workspaceId,
+				todoId,
+				isDone
+			});
+
+			socket.to(workspaceId).emit('receive-mark-todo', todoId, isDone);
+		});
+
+		socket.on('delete-todo', async (todoId: string) => {
+			logInfo(`[socket] ${socket.user.name}: event = 'delete-todo'`);
+
+			await deleteToDo({
+				workspaceId,
+				todoId
+			});
+
+			socket.to(workspaceId).emit('receive-delete-todo', todoId);
 		});
 	});
 });
