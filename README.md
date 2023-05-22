@@ -6,7 +6,7 @@ Web app to work and learn together featuring To Do lists, Chat, Ask AI section a
 
 [Filip Korus](https://fkor.us/) <[fkorus@student.agh.edu.pl](mailto:fkorus@student.agh.edu.pl)> ,
 
-Aleksandra Łapczuk <[alapczuk@student.agh.edu.pl](mailto:alapczuk@student.agh.edu.pl)>
+[Aleksandra Łapczuk](https://github.com/alapczvk) <[alapczuk@student.agh.edu.pl](mailto:alapczuk@student.agh.edu.pl)>
 
 ## Used technologies
 - MongoDB
@@ -23,13 +23,13 @@ Aleksandra Łapczuk <[alapczuk@student.agh.edu.pl](mailto:alapczuk@student.agh.e
 
 ### Project structure
 Project is divided into 2 main directories.
-- [client](https://github.com/filipkorus/AF-workspace/tree/main/client) - client with react, typescript, material ui, socket.io
-- [server](https://github.com/filipkorus/AF-workspace/tree/main/server) - server with node, express, socket.io
+- [client](client) - client with react, typescript, material ui, socket.io
+- [server](server) - server with node, express, socket.io
 
 ## Quick preview of our project
 *Log in with Google*
-![](C:\Users\sandr\Pulpit\Studia\AF-workspace\preview1.png)
+![preview01](preview\preview01.png)
 *Main view after joining a workspace*
-![preview2](C:\Users\sandr\Pulpit\Studia\AF-workspace\preview2.png)
+![preview2](preview\preview2.png)
 
 
