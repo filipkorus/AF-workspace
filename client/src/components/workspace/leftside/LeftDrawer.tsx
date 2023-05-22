@@ -18,8 +18,9 @@ import {
     AttachFile as AttachFileIcon,
     Article as ArticleIcon,
     SmartToy as SmartToyIcon,
+    PictureAsPdf as PictureAsPdfIcon,
     ExpandLess,
-    ExpandMore
+    ExpandMore, PersonAdd as PersonAddIcon
 } from "@mui/icons-material";
 import ToDoList from './ToDoList';
 import React, {useEffect, useState} from 'react';
@@ -31,11 +32,13 @@ import DragnDrop from "./DragnDrop";
 import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
-import {getSharedFiles, getUserWorkspaces} from '../../../api/workspace';
+import {getSharedFiles, getUserWorkspaces, getWorkspaceContent} from '../../../api/workspace';
 import AddUserToWorkspace from './AddUserToWorkspace';
 import RemoveUserFromWorkspace from './RemoveUserFromWorkspace';
 import {IWorkspaceSharedFile, IWorkspaceTODO} from '../../../types';
 import AIChat from './AIChat';
+import {pdfExporter} from 'quill-to-pdf';
+import saveBlobToFile from '../../../utils/saveBlobToFile';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
@@ -129,6 +132,17 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 <Typography variant="h6" noWrap component="div">
                     {workspaceName}
                 </Typography>
+                <IconButton sx={{ml: 1, color: "whitesmoke"}} title="export document to PDF" size="small"
+                            onClick={async () => {
+                                const quillDelta = await getWorkspaceContent(workspaceId as string);
+                                const pdfBlob = await pdfExporter.generatePdf(quillDelta);
+                                saveBlobToFile({
+                                    blob: pdfBlob,
+                                    fileName: `${workspaceName}.pdf`
+                                });
+                            }}>
+                    <PictureAsPdfIcon/>
+                </IconButton>
             </Toolbar>
         </AppBar>
         <Drawer

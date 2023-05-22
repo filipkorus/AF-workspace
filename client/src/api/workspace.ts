@@ -1,4 +1,6 @@
 import api from './index';
+import workspace from '../components/Workspace';
+import saveBlobToFile from '../utils/saveBlobToFile';
 
 export const getUserWorkspaces = async () => {
 	try {
@@ -65,6 +67,18 @@ export const getSharedFiles = async (workspaceId: string) => {
 		const {status, data} = await api.get(`/workspace/${workspaceId}/sharedFile`);
 		return data.sharedFiles;
 	} catch (error: any) {
+		return null;
+	}
+};
+
+export const getWorkspaceContent = async (workspaceId: string) => {
+	if (workspaceId == null) return null;
+
+	try {
+		const {data} = await api.get(`/workspace/${workspaceId}`);
+		return data?.workspace?.content;
+	} catch (error) {
+		alert('Server error');
 		return null;
 	}
 };

@@ -61,9 +61,13 @@ export const getAllWorkspacesByUserId = async (userId: string) => {
 	}
 };
 
+/**
+ * @return Workspace object.
+ * @param workspaceId ID of a workspace.
+ */
 export const getWorkspaceById = async (workspaceId: string) => {
 	try {
-		return await Workspace.findById(workspaceId, {content: 0, __v: 0, messages: 0, AIChat: 0, todos: 0});
+		return await Workspace.findById(workspaceId, {__v: 0, messages: 0, AIChat: 0, todos: 0});
 	} catch (error) {
 		logError(error);
 		return null;

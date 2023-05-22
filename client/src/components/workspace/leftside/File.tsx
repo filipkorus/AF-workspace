@@ -6,6 +6,7 @@ import {ReactJSXElement} from '@emotion/react/types/jsx-namespace';
 import {useParams} from 'react-router-dom';
 import api from '../../../api';
 import {Delete as DeleteIcon} from '@mui/icons-material';
+import saveBlobToFile from '../../../utils/saveBlobToFile';
 
 const File = ({file, handleRemoveFile, isUploading}: {
 	file: IWorkspaceSharedFile,
@@ -20,20 +21,12 @@ const File = ({file, handleRemoveFile, isUploading}: {
 				responseType: 'blob'
 			});
 			const file = new Blob([data]);
-			const a = document.createElement('a');
-			const url = URL.createObjectURL(file);
-
-			a.href = url;
-			a.download = _file.originalFilename;
-			document.body.appendChild(a);
-			a.click();
-			setTimeout(() => {
-				document.body.removeChild(a);
-				window.URL.revokeObjectURL(url);
-			}, 0);
+			saveBlobToFile({
+				blob: file,
+				fileName: _file.originalFilename
+			});
 		} catch (error) {
 			alert('Server error');
-			console.log(error);
 		}
 	};
 
