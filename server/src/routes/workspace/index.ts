@@ -2,7 +2,7 @@ import {
 	AddWorkspaceMemberHandler,
 	DeleteWorkspaceHandler, GetSharedFileByUniqueNameHandler, GetSharedFilesHandler,
 	GetUserWorkspacesHandler, RemoveWorkspaceMemberHandler, DeleteSharedFileByUniqueNameHandler,
-	RenameWorkspaceHandler
+	RenameWorkspaceHandler, GetWorkspaceHandler
 } from '../../controllers/workspace';
 import {Router} from 'express';
 
@@ -12,6 +12,7 @@ const router = Router();
 
 router.get('/', GetUserWorkspacesHandler);
 
+router.get('/:id', GetWorkspaceHandler);
 router.delete('/:id', DeleteWorkspaceHandler);
 router.put('/:id', RenameWorkspaceHandler);
 

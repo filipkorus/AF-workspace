@@ -119,7 +119,7 @@ const AIChat = () => {
                  variant="outlined"
                  size="small"
                  color="error"
-                 sx={{mt:.7, mr: .5, width: '98%'}}
+                 sx={{my:.7, mr: .5, width: '98%'}}
                  onClick={() => setOpenClearAIChatDialog(true)}
              >
                  Clear chat

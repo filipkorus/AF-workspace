@@ -10,7 +10,7 @@ import {
 import {
 	addMemberToWorkspace,
 	deleteWorkspaceById, findWorkspaceByIdAndUpdateName,
-	getAllWorkspacesByUserId,
+	getAllWorkspacesByUserId, getWorkspaceById,
 	isUserMemberOrCreatorOfWorkspace, removeMemberFromWorkspace
 } from '../../services/workspace/document.service';
 import {getUserByEmail} from '../../services/user/auth.service';
@@ -28,11 +28,41 @@ export const GetUserWorkspacesHandler = async (req, res) => {
 	return SUCCESS(res, {workspaces: await getAllWorkspacesByUserId(res.locals.user.id)});
 };
 
+export const GetWorkspaceHandler = async (req, res) => {
+	const {id: workspaceId} = req.params;
+
+	if (workspaceId == null) {
+		return BAD_REQUEST(res);
+	}
+
+	const isUserPermitted = await isUserMemberOrCreatorOfWorkspace(workspaceId, res.locals.user.id);
+
+	if (isUserPermitted == null) {
+		return BAD_REQUEST(res);
+	}
+
+	if (!isUserPermitted) {
+		return FORBIDDEN(res);
+	}
+
+	return SUCCESS(res, {workspace: await getWorkspaceById(workspaceId)});
+};
+
 export const DeleteWorkspaceHandler = async (req, res) => {
 	const {id: workspaceIdToDelete} = req.params;
 
 	if (workspaceIdToDelete == null) {
 		return BAD_REQUEST(res);
+	}
+
+	const isUserPermitted = await isUserMemberOrCreatorOfWorkspace(workspaceIdToDelete, res.locals.user.id);
+
+	if (isUserPermitted == null) {
+		return BAD_REQUEST(res);
+	}
+
+	if (!isUserPermitted) {
+		return FORBIDDEN(res);
 	}
 
 	await deleteWorkspaceById(workspaceIdToDelete, res.locals.user.id);
