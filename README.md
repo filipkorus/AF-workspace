@@ -28,8 +28,8 @@ Project is divided into 2 main directories.
 
 ## Quick preview of our project
 *Log in with Google*
-![preview01](preview\preview01.png)
+![login screen](preview\preview01.png)
 *Main view after joining a workspace*
-![preview2](preview\preview2.png)
+![main view after joining a workspace](preview\preview02.png)
 
 
