@@ -8,7 +8,7 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Collapse, Button, Box
+    Collapse
 } from '@mui/material';
 import {
     Menu as MenuIcon,
@@ -16,14 +16,12 @@ import {
     ChevronRight as ChevronRightIcon,
     AddTask as AddTaskIcon,
     AttachFile as AttachFileIcon,
-    SavedSearch as SavedSearchIcon,
-    Add as AddIcon,
-    PersonAdd as PersonAddIcon,
+    Article as ArticleIcon,
     SmartToy as SmartToyIcon,
     ExpandLess,
     ExpandMore
 } from "@mui/icons-material";
-import ToDos from './ToDos';
+import ToDoList from './ToDoList';
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../../../contexts/AuthContext';
@@ -33,20 +31,20 @@ import DragnDrop from "./DragnDrop";
 import {Typography} from '@mui/material';
 import {useSocket} from '../../../contexts/SocketContext';
 import WorkspaceList from './WorkspaceList';
-import {getSharedFiles, getUserWorkspaces, renameWorkspace} from '../../../api/workspace';
+import {getSharedFiles, getUserWorkspaces} from '../../../api/workspace';
 import AddUserToWorkspace from './AddUserToWorkspace';
 import RemoveUserFromWorkspace from './RemoveUserFromWorkspace';
-import {IWorkspaceSharedFile} from '../../../types';
+import {IWorkspaceSharedFile, IWorkspaceTODO} from '../../../types';
 import AIChat from './AIChat';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
     const {socket, isConnected, isRoomJoined}: any = useSocket();
-    const [mobileOpen, setMobileOpen] = useState(false);
+
     const [openDragNDrop, setOpenDragNDrop] = useState(false);
     const [openAddTask, setOpenAddTask] = useState(false);
     const [openSavedWork, setOpenSavedWork] = useState(false);
-    const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
     const [open, setOpen] = useState(false);
+
     const handleClickDrag = () => {
         setOpenDragNDrop(!openDragNDrop);
     };
@@ -100,6 +98,17 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
            .catch((error: any) => {});
     }, [socket, isConnected, isRoomJoined]);
 
+    const [todos, setTodos] = useState<IWorkspaceTODO[]>([]);
+    useEffect(() => {
+        if (socket == null || !isRoomJoined) return;
+
+        socket.once('load-todos', (todos: IWorkspaceTODO[]) => {
+           setTodos(todos);
+        });
+
+        socket.emit('get-todos');
+    }, [socket, isConnected, isRoomJoined]);
+
     const {id: workspaceId} = useParams<string>();
     const workspaceName = (workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?.name || '';
 
@@ -147,9 +156,9 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 </ListItemButton>
 
                 <ListItemButton onClick={handleClickWork}>
-                    {/*<ListItemIcon>*/}
-                    {/*    <SavedSearchIcon />*/}
-                    {/*</ListItemIcon>*/}
+                    <ListItemIcon>
+                        <ArticleIcon />
+                    </ListItemIcon>
                     <ListItemText primary="Your workspaces" />
                     {openSavedWork ? <ExpandLess /> : <ExpandMore />}
                 </ListItemButton>
@@ -181,9 +190,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
                 </ListItemButton>
                 <Collapse in={openAddTask} timeout="auto">
                     <List component="div" disablePadding>
-                        <ListItemButton>
-                            <ToDos/>
-                        </ListItemButton>
+                        <ToDoList todos={todos} setTodos={setTodos}/>
                     </List>
                 </Collapse>
 

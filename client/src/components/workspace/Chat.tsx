@@ -80,7 +80,7 @@ const Chat = () => {
 				{/* pusty div użyty do ustawienia referencji */}
 			</Box>
 			<div style={{position: 'fixed', bottom: "20px", borderRadius: "10px"}}>
-				<ChatInput handleSendMessage={handleSendMessage}/>
+				<ChatInput handleSubmit={handleSendMessage}/>
 			</div>
 		</>
 	);
