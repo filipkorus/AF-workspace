@@ -1,4 +1,3 @@
-
 # AF workspace 
 Web app to work and learn together featuring To Do lists, Chat, Ask AI section and Drag and Drop trait.
 
@@ -13,8 +12,8 @@ Web app to work and learn together featuring To Do lists, Chat, Ask AI section a
 - Express
 - React
 - Node.js
-- Docker
 - Socket.io
+- Docker
 
 ## Requirements
 - Node.js (version 16.16 or higher)
@@ -23,8 +22,8 @@ Web app to work and learn together featuring To Do lists, Chat, Ask AI section a
 
 ### Project structure
 Project is divided into 2 main directories.
-- [client](client) - client with react, typescript, material ui, socket.io
-- [server](server) - server with node, express, socket.io
+- [client](client) - client (React with TypeScript, Material UI, socket.io)
+- [server](server) - server (Node, Express, socket.io)
 
 ## Quick preview of our project
 *Log in with Google*
