@@ -112,7 +112,7 @@ const AIChat = () => {
 		}}>
 			{messages.map((msg: IWorkspaceAIChat, index) => (
 				<Message name={msg.role === 'assistant' ? 'AI': msg.author?.name as string} content={msg.content} timestamp={formatDate(msg.addedAt)}
-				         key={index} isMyMessage={msg.role === 'user' && msg.author?._id as string === currentUser._id}/>
+				         key={index} isMyMessage={msg.role === 'user' && msg.author?._id as string === currentUser._id} grayMessage={msg.role === 'assistant'}/>
 			))}
 			{messages.length > 0 &&
              <Button
