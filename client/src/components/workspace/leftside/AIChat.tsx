@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ChatInput from '../ChatInput';
-import {IWorkspaceAIChat, IWorkspaceMessage} from '../../../types';
+import {IWorkspaceAIChat} from '../../../types';
 import Message from '../Message';
 import formatDate from '../../../utils/formatDate';
 import {
@@ -11,13 +11,10 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
-	IconButton
 } from '@mui/material';
 import {useAuth} from '../../../contexts/AuthContext';
 import {useSocket} from '../../../contexts/SocketContext';
 import {useParams} from 'react-router-dom';
-import {Delete as DeleteIcon} from '@mui/icons-material';
-import {deleteWorkspace} from '../../../api/workspace';
 
 const AIChat = () => {
 	const [messages, setMessages] = useState<IWorkspaceAIChat[]>([]);
