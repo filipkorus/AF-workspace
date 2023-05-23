@@ -85,7 +85,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 	},
 	createdAt: {
 		type: Date,
-		default: new Date()
+		default: new Date
 	},
 	members: [{
 		userId: {
@@ -97,7 +97,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 		},
 		addedAt: {
 			type: Date,
-			default: new Date()
+			default: new Date
 		}
 	}],
 	messages: [{
@@ -116,7 +116,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 		},
 		createdAt: {
 			type: Date,
-			default: new Date()
+			default: new Date
 		}
 	}],
 	todos: [{
@@ -139,7 +139,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 		},
 		addedAt: {
 			type: Date,
-			default: new Date()
+			default: new Date
 		}
 	}],
 	sharedFiles: [{
@@ -162,7 +162,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 		},
 		addedAt: {
 			type: Date,
-			default: new Date()
+			default: new Date
 		}
 	}],
 	AIChat: [{
@@ -184,7 +184,7 @@ const workspaceSchema = new Schema<IWorkspace>({
 		},
 		addedAt: {
 			type: Date,
-			default: new Date()
+			default: new Date
 		}
 	}]
 });
