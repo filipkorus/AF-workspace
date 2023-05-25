@@ -70,6 +70,11 @@ io.on('connection', socket => {
 	socket.emit('greeting-from-server', {msg: 'Hello Client'});
 
 	socket.on('get-document', async (workspaceId: string) => {
+		if (socket.user == null) {
+			socket.disconnect();
+			return;
+		}
+
 		/* document */
 		const workspace = await findOrCreateWorkspace(workspaceId, socket.user.id);
 
