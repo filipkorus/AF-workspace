@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
-import {Box, Button, css} from "@mui/material";
+import {Box, Button} from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import theme from "../../utils/theme";
 import {useSocket} from '../../contexts/SocketContext';
 import { SxProps } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
+import ISocketContext from '../../types/ISocketContext';
 
 const ChatInput = ({handleSubmit, addIcon, placeholder, rows, sx}: {
     handleSubmit: (text: string) => void,
@@ -13,7 +14,7 @@ const ChatInput = ({handleSubmit, addIcon, placeholder, rows, sx}: {
     rows?: number,
     sx?: SxProps
 }) => {
-    const {isConnected}: any = useSocket();
+    const {isConnected, isRoomJoined} = useSocket() as ISocketContext;
     const [msg, setMsg] = useState("");
     const sendChat = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -48,7 +49,7 @@ const ChatInput = ({handleSubmit, addIcon, placeholder, rows, sx}: {
                     disabled={!isConnected}
                 />
 
-                <Button className="sending" variant="contained" disabled={!isConnected} type="submit" onClick={handleButtonClick}
+                <Button className="sending" variant="contained" disabled={!isConnected || !isRoomJoined} type="submit" onClick={handleButtonClick}
                         style={{backgroundColor: "lavenderblush",borderBottomRightRadius:"10px",borderTopRightRadius: "10px", maxWidth:"20px",width: "fit-content", marginLeft: '1px'}}>
                     {!addIcon && <SendIcon style={{color:theme.palette.primary.main}}/>}
                     {addIcon && <AddIcon style={{color: theme.palette.primary.main}}/>}

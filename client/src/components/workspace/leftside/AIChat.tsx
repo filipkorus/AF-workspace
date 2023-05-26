@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ChatInput from '../ChatInput';
-import {IWorkspaceAIChat} from '../../../types';
 import Message from '../Message';
 import formatDate from '../../../utils/formatDate';
 import {
@@ -15,17 +14,22 @@ import {
 import {useAuth} from '../../../contexts/AuthContext';
 import {useSocket} from '../../../contexts/SocketContext';
 import {useParams} from 'react-router-dom';
+import IWorkspaceAIChat from '../../../types/IWorkspaceAIChat';
+import ISocketContext from '../../../types/ISocketContext';
+import IAuthContext from '../../../types/IAuthContext';
 
 const AIChat = () => {
 	const [messages, setMessages] = useState<IWorkspaceAIChat[]>([]);
-	const {currentUser}: any = useAuth();
-	const {socket, isConnected, isRoomJoined}: any = useSocket();
+	const {currentUser} = useAuth() as IAuthContext;
+	const {socket, isConnected, isRoomJoined} = useSocket() as ISocketContext;
 	const {id: workspaceId} = useParams();
 	const messageEndRef = useRef<HTMLDivElement>(null);
 
 	const [openClearAIChatDialog, setOpenClearAIChatDialog] = useState<boolean>(false);
 
 	const handleSendMessage = (msg: string) => {
+		if (socket == null || currentUser == null) return;
+
 		socket.emit('send-aichat-message', msg);
 
 		setMessages([...messages, {
@@ -109,7 +113,7 @@ const AIChat = () => {
 		}}>
 			{messages.map((msg: IWorkspaceAIChat, index) => (
 				<Message name={msg.role === 'assistant' ? 'AI': msg.author?.name as string} content={msg.content} timestamp={formatDate(msg.addedAt)}
-				         key={index} isMyMessage={msg.role === 'user' && msg.author?._id as string === currentUser._id} grayMessage={msg.role === 'assistant'}/>
+				         key={index} isMyMessage={msg.role === 'user' && msg.author?._id as string === currentUser?._id} grayMessage={msg.role === 'assistant'}/>
 			))}
 			{messages.length > 0 &&
              <Button

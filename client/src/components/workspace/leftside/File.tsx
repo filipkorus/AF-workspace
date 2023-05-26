@@ -1,17 +1,15 @@
 import React from 'react';
 import {Box, IconButton, Link} from '@mui/material';
 import theme from '../../../utils/theme';
-import {IWorkspaceSharedFile} from '../../../types';
-import {ReactJSXElement} from '@emotion/react/types/jsx-namespace';
 import {useParams} from 'react-router-dom';
 import api from '../../../api';
 import {Delete as DeleteIcon} from '@mui/icons-material';
 import saveBlobToFile from '../../../utils/saveBlobToFile';
+import IWorkspaceSharedFile from '../../../types/IWorkspaceSharedFile';
 
-const File = ({file, handleRemoveFile, isUploading}: {
+const File = ({file, handleRemoveFile}: {
 	file: IWorkspaceSharedFile,
 	handleRemoveFile: (file: IWorkspaceSharedFile) => void
-	isUploading?: boolean
 }) => {
 	const {id: workspaceId} = useParams();
 

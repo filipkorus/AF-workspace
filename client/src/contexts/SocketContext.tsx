@@ -1,11 +1,12 @@
-import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {io, Socket} from 'socket.io-client';
 import api from '../api';
 import CONFIG from '../config';
+import ISocketContext from '../types/ISocketContext';
 
-const SocketContext = createContext(null);
+const SocketContext = createContext<ISocketContext | null>(null);
 
-export function useSocket() {
+export function useSocket(): ISocketContext | null {
 	return useContext(SocketContext);
 }
 
@@ -26,52 +27,44 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 		});
 
 		const onConnect = () => {
-			console.log('connect');
+			console.log('[socket.io] connected to server');
 			setIsConnected(true);
 			setReconnectAttempt(0);
 		};
 		const onDisconnect = () => {
-			console.log('disconnect');
+			console.log('[socket.io] disconnected from server');
 			setIsConnected(false);
 		};
-		const onError = (error: Error) => console.log(`error: ${error}`);
+		const onError = (error: Error) => console.log(`[socket.io] error: ${error}`);
 		const onConnectError = (error: Error) => {
-			console.log(`connect_error due to ${error.message}`);
-			if (error.message === 'Authentication error') {
-				if (accessToken != null) {
-					window.location.reload();
-				}
-			}
+			console.log(`[socket.io] connect error due to ${error.message}`);
 		}
 		const onReconnect = (attempt: number) => {
 			setReconnectAttempt(0);
 			setIsConnected(true);
-			console.log(`reconnect on attempt: ${attempt}`);
+			console.log(`[socket.io] reconnected on attempt: ${attempt}`);
 		}
 		const onReconnectAttempt = (attempt: number) => {
 			setReconnectAttempt(attempt);
-			console.log('reconnect_attempt: ' + attempt);
+			console.log('[socket.io] reconnect attempt: ' + attempt);
 		}
 		const onReconnectError = (error: Error) => {
-			console.log(`reconnect_error: ${error}`);
-			if (error?.message === 'Authentication error') {
-				// window.location.reload();
-			}
+			console.log(`[socket.io] reconnect error: ${error}`);
 		}
-		const onReconnectFailed = () => console.log('reconnect_failed');
+		const onReconnectFailed = () => console.log('[socket.io] reconnect failed');
 
-		const onGreetingFromServer = (data: any) => console.log(`Server sent message: ${data.msg}`);
+		const onGreetingFromServer = (data: any) => console.log(`[socket.io] server sent welcome message: ${data?.msg}`);
 
 		newSocket.on('connect', onConnect);
 		newSocket.on('disconnect', onDisconnect);
 		newSocket.on('error', onError);
-		newSocket.on("connect_error", onConnectError);
+		newSocket.on('connect_error', onConnectError);
 
-		newSocket.io.on("error", onError);
-		newSocket.io.on("reconnect", onReconnect);
-		newSocket.io.on("reconnect_attempt", onReconnectAttempt);
-		newSocket.io.on("reconnect_error", onReconnectError);
-		newSocket.io.on("reconnect_failed", onReconnectFailed);
+		newSocket.io.on('error', onError);
+		newSocket.io.on('reconnect', onReconnect);
+		newSocket.io.on('reconnect_attempt', onReconnectAttempt);
+		newSocket.io.on('reconnect_error', onReconnectError);
+		newSocket.io.on('reconnect_failed', onReconnectFailed);
 
 		newSocket.on('greeting-from-server', onGreetingFromServer);
 
@@ -80,14 +73,14 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 		return () => {
 			newSocket.off('connect', onConnect);
 			newSocket.off('disconnect', onDisconnect);
-			newSocket.off("error", onError);
+			newSocket.off('error', onError);
 			newSocket.off('connect_error', onConnectError);
 
 			newSocket.io.off("error", onError);
-			newSocket.io.off("reconnect", onReconnect);
-			newSocket.io.off("reconnect_attempt", onReconnectAttempt);
-			newSocket.io.off("reconnect_error", onReconnectError);
-			newSocket.io.off("reconnect_failed", onReconnectFailed);
+			newSocket.io.off('reconnect', onReconnect);
+			newSocket.io.off('reconnect_attempt', onReconnectAttempt);
+			newSocket.io.off('reconnect_error', onReconnectError);
+			newSocket.io.off('reconnect_failed', onReconnectFailed);
 
 			newSocket.off('greeting-from-server', onGreetingFromServer);
 
@@ -95,14 +88,13 @@ export function SocketProvider({children}: { children: JSX.Element }) {
 		}
 	}, []);
 
-	const value = {
+	return <SocketContext.Provider value={{
 		socket,
 		isConnected,
+		reconnectAttempt,
 		isRoomJoined,
 		setIsRoomJoined
-	} as any;
-
-	return <SocketContext.Provider value={value}>
+	}}>
 		{children}
 	</SocketContext.Provider>;
 }

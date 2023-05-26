@@ -11,16 +11,18 @@ import CONFIG from '../../../config/index';
 import {v4 as uuidv4} from 'uuid';
 import File from './File';
 import {useSocket} from '../../../contexts/SocketContext';
-import {IWorkspaceSharedFile} from '../../../types';
 import getFileExtension from '../../../utils/getFileExtension';
 import {useAuth} from '../../../contexts/AuthContext';
+import IWorkspaceSharedFile from '../../../types/IWorkspaceSharedFile';
+import IAuthContext from '../../../types/IAuthContext';
+import ISocketContext from '../../../types/ISocketContext';
 
 const DragnDrop = ({sharedFiles, setSharedFiles}: {
 	sharedFiles: IWorkspaceSharedFile[],
 	setSharedFiles: React.Dispatch<React.SetStateAction<IWorkspaceSharedFile[]>>
 }) => {
-	const {currentUser}: any = useAuth();
-	const {socket, isConnected, isRoomJoined}: any = useSocket();
+	const {currentUser} = useAuth() as IAuthContext;
+	const {socket, isConnected, isRoomJoined} = useSocket() as ISocketContext;
 
 	const fileInput = useRef<HTMLInputElement>(null);
 	const dropzoneArea = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 	};
 
 	const handleFileValidation = async (file: File) => {
-		if (!isConnected || !isRoomJoined) return alert('Connection error...');
+		if (!isConnected || !isRoomJoined || currentUser == null) return alert('Connection error...');
 
 		if (file.size > CONFIG.dragAndDrop.maxFileSizeInBytes) {
 			return alert(`Maximum filesize is ${CONFIG.dragAndDrop.maxFileSizeInBytes / 1_000_000} MB`);
@@ -67,7 +69,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		}
 
 		try {
-			const {msg, uniqueFilename}: any = await uploadFile(file, fileExtension);
+			const {uniqueFilename}: any = await uploadFile(file, fileExtension);
 			setSharedFiles([{
 				_id: uuidv4(),
 				originalFilename: file.name,
@@ -101,7 +103,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		}
 
 		try {
-			const {msg}: any = await removeFile(fileToRemove.uniqueFilename);
+			await removeFile(fileToRemove.uniqueFilename);
 			setSharedFiles(
 				sharedFiles.filter((file: IWorkspaceSharedFile) => file.uniqueFilename !== fileToRemove.uniqueFilename)
 			);
@@ -157,7 +159,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		return () => {
 			socket.off('receive-file', handler);
 		};
-	}, [socket, sharedFiles]);
+	}, [socket, sharedFiles, setSharedFiles]);
 
 	/* removing shared files */
 	useEffect(() => {
@@ -174,7 +176,7 @@ const DragnDrop = ({sharedFiles, setSharedFiles}: {
 		return () => {
 			socket.off('remove-file', handler);
 		};
-	}, [socket, sharedFiles]);
+	}, [socket, sharedFiles, setSharedFiles]);
 
 	useEffect(() => {
 		fileListBeginningRef.current?.scrollIntoView({behavior: "auto"}); // przewijanie na poczatek końca diva

@@ -10,7 +10,7 @@ import {
 	TextField
 } from '@mui/material';
 import {useParams} from 'react-router-dom';
-import {addUserToWorkspaceByEmail, removeUserFromWorkspaceByEmail, renameWorkspace} from '../../../api/workspace';
+import {removeUserFromWorkspaceByEmail} from '../../../api/workspace';
 
 const AddUserToWorkspace = ({workspaceName}: {workspaceName: string}) => {
 	const {id: workspaceId} = useParams();

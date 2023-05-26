@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useAuth} from "../contexts/AuthContext";
 import {useNavigate} from "react-router-dom";
 import {Alert, Box, Container, Grid, LinearProgress, Snackbar} from '@mui/material';
@@ -7,12 +7,13 @@ import theme from "../utils/theme";
 import logo from "../assets/logo.png";
 import {v4 as uuidv4} from 'uuid';
 import {getUserWorkspaces} from '../api/workspace';
+import IAuthContext from '../types/IAuthContext';
 
 const Login = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 
-	const {login, currentUser}: any = useAuth();
+	const {login, currentUser} = useAuth() as IAuthContext;
 	const navigate = useNavigate();
 
 	const params = new URLSearchParams(window.location.search);
@@ -33,7 +34,7 @@ const Login = () => {
 			window.location.reload();
 			return;
 		}
-		setError(error);
+		setError(error || '');
 		setLoading(false);
 	};
 
@@ -52,7 +53,7 @@ const Login = () => {
 				}
 			})
 			.catch((error: any) => {});
-	}, []);
+	}, [navigate]);
 
 	return <>
 		<Container maxWidth={false} style={{

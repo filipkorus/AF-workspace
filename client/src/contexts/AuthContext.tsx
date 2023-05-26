@@ -1,10 +1,11 @@
-import React, {useContext, useState, useEffect, createContext, useRef} from "react";
-import api from "../api";
-import {IUser} from '../types';
+import React, {useContext, useState, useEffect, createContext, useRef} from 'react';
+import api from '../api';
+import IUser from '../types/IUser';
+import IAuthContext from '../types/IAuthContext';
 
-const AuthContext = createContext({});
+const AuthContext = createContext<IAuthContext | null>(null);
 
-export function useAuth() {
+export function useAuth(): IAuthContext | null {
 	return useContext(AuthContext);
 }
 
@@ -73,13 +74,11 @@ export function AuthProvider({children}: { children: JSX.Element }) {
 		return () => setCurrentUser(null);
 	}, []);
 
-	const value = {
+	return <AuthContext.Provider value={{
 		currentUser,
 		login,
 		logout
-	};
-
-	return <AuthContext.Provider value={value}>
+	}}>
 		{!loading && children}
 	</AuthContext.Provider>;
 }

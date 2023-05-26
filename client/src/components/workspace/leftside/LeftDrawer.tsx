@@ -20,7 +20,7 @@ import {
     SmartToy as SmartToyIcon,
     PictureAsPdf as PictureAsPdfIcon,
     ExpandLess,
-    ExpandMore, PersonAdd as PersonAddIcon
+    ExpandMore
 } from "@mui/icons-material";
 import ToDoList from './ToDoList';
 import React, {useEffect, useState} from 'react';
@@ -35,13 +35,17 @@ import WorkspaceList from './WorkspaceList';
 import {getSharedFiles, getUserWorkspaces, getWorkspaceContent} from '../../../api/workspace';
 import AddUserToWorkspace from './AddUserToWorkspace';
 import RemoveUserFromWorkspace from './RemoveUserFromWorkspace';
-import {IWorkspaceSharedFile, IWorkspaceTODO} from '../../../types';
 import AIChat from './AIChat';
 import {pdfExporter} from 'quill-to-pdf';
 import saveBlobToFile from '../../../utils/saveBlobToFile';
+import IWorkspaceSharedFile from '../../../types/IWorkspaceSharedFile';
+import IWorkspaceTODO from '../../../types/IWorkspaceTODO';
+import IWorkspace from '../../../types/IWorkspace';
+import ISocketContext from '../../../types/ISocketContext';
+import IAuthContext from '../../../types/IAuthContext';
 
 const LeftDrawer = ({children}: { children?: JSX.Element }) => {
-    const {socket, isConnected, isRoomJoined}: any = useSocket();
+    const {socket, isConnected, isRoomJoined} = useSocket() as ISocketContext;
 
     const [openDragNDrop, setOpenDragNDrop] = useState(false);
     const [openAddTask, setOpenAddTask] = useState(false);
@@ -61,10 +65,10 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
         setOpen(!open);
     };
 
-    const {currentUser, logout}: any = useAuth();
+    const {id: workspaceId} = useParams<string>();
+    const {logout} = useAuth() as IAuthContext;
     const navigate = useNavigate();
-    const handleSendToDo = (text: string) => {
-    }
+
     const handleLogout = async () => {
         const {success, error} = await logout();
 
@@ -99,7 +103,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
         getSharedFiles(workspaceId as string)
            .then((_sharedFiles: IWorkspaceSharedFile[]) => setSharedFiles(_sharedFiles))
            .catch((error: any) => {});
-    }, [socket, isConnected, isRoomJoined]);
+    }, [socket, isConnected, isRoomJoined, workspaceId]);
 
     const [todos, setTodos] = useState<IWorkspaceTODO[]>([]);
     useEffect(() => {
@@ -112,8 +116,7 @@ const LeftDrawer = ({children}: { children?: JSX.Element }) => {
         socket.emit('get-todos');
     }, [socket, isConnected, isRoomJoined]);
 
-    const {id: workspaceId} = useParams<string>();
-    const workspaceName = (workspaces.find((workspace: any) => workspace?._id === workspaceId) as any)?.name || '';
+    const workspaceName = ((workspaces.find((workspace: IWorkspace) => workspace._id === workspaceId)) as any)?.name || '';
 
     return <>
         <CssBaseline/>
