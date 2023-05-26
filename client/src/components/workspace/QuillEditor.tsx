@@ -5,12 +5,13 @@ import Quill, {DeltaOperation} from 'quill';
 import 'quill/dist/quill.snow.css';
 import '../../styles/QuillEditor.css';
 import {useParams} from 'react-router-dom';
+import ISocketContext from '../../types/ISocketContext';
 
 const QuillEditor = () => {
     const [quill, setQuill] = useState<any>(null);
     const documentLoaded = useRef<boolean>(false);
-    const {socket, isConnected, setIsRoomJoined, isRoomJoined}: any = useSocket();
-    const {id: workspaceId}: any = useParams();
+    const {socket, isConnected, setIsRoomJoined, isRoomJoined} = useSocket() as ISocketContext;
+    const {id: workspaceId} = useParams();
     const SAVE_DOCUMENT_INTERVAL_MS = 2000;
 
     const wrapperRef = useCallback((wrapper: any) => {
@@ -51,7 +52,7 @@ const QuillEditor = () => {
     }, []);
 
     useEffect(() => {
-        if (!documentLoaded.current || quill == null) return;
+        if (!documentLoaded.current || quill == null || socket == null) return;
 
         if (isConnected) {
             socket.emit('get-document', workspaceId);
@@ -60,9 +61,9 @@ const QuillEditor = () => {
             setIsRoomJoined(false);
         }
 
-        quill.enable(isConnected);
+        quill.enable(isConnected && isRoomJoined);
         quill.focus();
-    }, [quill, isConnected]);
+    }, [quill, isConnected, isRoomJoined, setIsRoomJoined, socket, workspaceId]);
 
     useEffect(() => {
         if (socket == null || quill == null) return;

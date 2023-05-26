@@ -1,16 +1,16 @@
 import React, {useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
-import {ListItemButton, ListItem, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Typography } from '@mui/material';
+import {ListItemButton, ListItem, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField } from '@mui/material';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Delete as DeleteIcon, Edit as EditIcon} from '@mui/icons-material';
 import {useAuth} from '../../../contexts/AuthContext';
 import {deleteWorkspace, renameWorkspace} from '../../../api/workspace';
 import theme from '../../../utils/theme';
-import workspace from '../../Workspace';
+import IAuthContext from '../../../types/IAuthContext';
 
 const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
-	const {currentUser}: any = useAuth();
-	const {id: workspaceId}: any = useParams();
+	const {currentUser} = useAuth() as IAuthContext;
+	const {id: workspaceId} = useParams();
 	const navigate = useNavigate();
 
 	const [openDeleteWorkspaceDialog, setOpenDeleteWorkspaceDialog] = useState<boolean>(false);
@@ -98,10 +98,10 @@ const WorkspaceList = ({workspaces, setWorkspaces}: any) => {
 		{workspaces.map((workspace: any) => <ListItem component="div" disablePadding key={uuidv4()} sx={{backgroundColor: workspace._id === workspaceId ? theme.palette.secondary.main : ''}}>
            <ListItem>
               <IconButton aria-label="delete"
-                          title={workspace.createdBy === currentUser._id ? 'delete this workspace' : 'you are not the owner of this workspace'}
+                          title={workspace.createdBy === currentUser?._id ? 'delete this workspace' : 'you are not the owner of this workspace'}
                           size="small"
-                          onClick={workspace.createdBy === currentUser._id ? () => handleDeleteWorkspace({id:workspace._id, name:workspace.name}) : () => alert('you are not the owner of this workspace')}>
-                   <DeleteIcon fontSize="inherit" color={workspace.createdBy === currentUser._id ? 'error' : 'disabled'}/>
+                          onClick={workspace.createdBy === currentUser?._id ? () => handleDeleteWorkspace({id:workspace._id, name:workspace.name}) : () => alert('you are not the owner of this workspace')}>
+                   <DeleteIcon fontSize="inherit" color={workspace.createdBy === currentUser?._id ? 'error' : 'disabled'}/>
                </IconButton>
                <ListItemButton
                    onClick={() => handleRedirectAndReload(`/workspace/${workspace._id}`)}

@@ -1,5 +1,3 @@
-import {useParams} from 'react-router-dom';
-import {useAuth} from '../contexts/AuthContext';
 import {Alert, Box, LinearProgress, Snackbar} from '@mui/material';
 import LeftDrawer from './workspace/leftside/LeftDrawer';
 import React, {useEffect, useRef, useState} from 'react';
@@ -10,9 +8,6 @@ import Chat from './workspace/Chat';
 import theme from "../utils/theme";
 
 const Workspace = () => {
-    const {id}: any = useParams();
-    const {currentUser}: any = useAuth();
-
     const [openReconnectedSnackbar, setOpenReconnectedSnackbar] = useState<boolean>(false);
     const [openReconnectingSnackbar, setOpenReconnectingSnackbar] = useState<boolean>(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -52,8 +47,10 @@ const Workspace = () => {
     useEffect(() => {
         if (socket != null) socket.connect();
 
+        const timeouts = timeoutRef.current;
+
         return () => {
-            for (let timeout of timeoutRef.current) {
+            for (let timeout of timeouts) {
                 clearTimeout(timeout);
             }
         };

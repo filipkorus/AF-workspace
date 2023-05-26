@@ -6,16 +6,20 @@ import Message from "./Message";
 import {useAuth} from "../../contexts/AuthContext";
 import '../../styles/Scroll.css';
 import {useParams} from 'react-router-dom';
-import {IWorkspaceMessage} from '../../types';
 import formatDate from '../../utils/formatDate';
+import IWorkspaceMessage from '../../types/IWorkspaceMessage';
+import ISocketContext from '../../types/ISocketContext';
+import IAuthContext from '../../types/IAuthContext';
 
 const Chat = () => {
-	const {socket, isConnected, isRoomJoined}: any = useSocket();
-	const {id: workspaceId}: any = useParams();
+	const {socket, isConnected, isRoomJoined} = useSocket() as ISocketContext;
+	const {id: workspaceId} = useParams();
 	const [messages, setMessages] = useState<IWorkspaceMessage[]>([]);
 	const messageEndRef = useRef<HTMLDivElement>(null); // referencja do końca diva z wiadomościami
-	const {currentUser}: any = useAuth();
+	const {currentUser} = useAuth() as IAuthContext;
 	const handleSendMessage = (msg: string) => {
+		if (socket == null || currentUser == null) return;
+
 		socket.emit('send-message', msg);
 
 		setMessages([...messages, {
@@ -74,7 +78,7 @@ const Chat = () => {
 			}}>
 				{messages.map((message: IWorkspaceMessage, index) => (
 					<Message name={message.author.name} content={message.content} timestamp={formatDate(message.createdAt)}
-					         key={index} isMyMessage={message.author._id === currentUser._id}/>
+					         key={index} isMyMessage={message.author._id === currentUser?._id}/>
 				))}
 				<div ref={messageEndRef}/>
 				{/* pusty div użyty do ustawienia referencji */}

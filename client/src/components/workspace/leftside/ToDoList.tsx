@@ -2,17 +2,20 @@ import React, {useEffect} from 'react';
 import {Box} from "@mui/material";
 import {useSocket} from "../../../contexts/SocketContext";
 import ChatInput from '../ChatInput';
-import {IWorkspaceTODO} from '../../../types';
 import {v4 as uuidv4} from 'uuid';
 import ToDoItem from './ToDoItem';
+import IWorkspaceTODO from '../../../types/IWorkspaceTODO';
+import ISocketContext from '../../../types/ISocketContext';
 
 const ToDoList = ({todos, setTodos}: {
 	todos: IWorkspaceTODO[],
 	setTodos: React.Dispatch<React.SetStateAction<IWorkspaceTODO[]>>
 }) => {
-	const {socket, isConnected, isRoomJoined}: any = useSocket();
+	const {socket, isRoomJoined} = useSocket() as ISocketContext;
 
 	const handleAddTodo = (content: string) => {
+		if (socket == null || !isRoomJoined) return;
+
 		const trimmedContent = content.trim();
 
 		if (trimmedContent.length === 0) return;
@@ -22,7 +25,7 @@ const ToDoList = ({todos, setTodos}: {
 
 	/* creating ToDos */
 	useEffect(() => {
-		if (socket == null) return;
+		if (socket == null || !isRoomJoined) return;
 
 		const handler = (newTodo: IWorkspaceTODO) => {
 			setTodos([...todos, newTodo]);
@@ -33,11 +36,11 @@ const ToDoList = ({todos, setTodos}: {
 		return () => {
 			socket.off('receive-create-todo', handler);
 		};
-	}, [socket, todos]);
+	}, [socket, todos, isRoomJoined, setTodos]);
 
 	/* removing ToDos */
 	useEffect(() => {
-		if (socket == null) return;
+		if (socket == null || !isRoomJoined) return;
 
 		const handler = (todoId: string) => {
 			setTodos(
@@ -50,11 +53,11 @@ const ToDoList = ({todos, setTodos}: {
 		return () => {
 			socket.off('receive-delete-todo', handler);
 		};
-	}, [socket, todos]);
+	}, [socket, todos, isRoomJoined, setTodos]);
 
 	/* marking ToDos as done or undone */
 	useEffect(() => {
-		if (socket == null) return;
+		if (socket == null || !isRoomJoined) return;
 
 		const handler = (todoId: string, isDone: boolean) => {
 			setTodos(
@@ -70,9 +73,11 @@ const ToDoList = ({todos, setTodos}: {
 		return () => {
 			socket.off('receive-mark-todo', handler);
 		};
-	}, [socket, todos]);
+	}, [socket, todos, isRoomJoined, setTodos]);
 
 	const handleToDoDelete = (todoId: string) => {
+		if (socket == null || !isRoomJoined) return;
+
 		socket.emit('delete-todo', todoId);
 
 		setTodos(
@@ -81,6 +86,8 @@ const ToDoList = ({todos, setTodos}: {
 	};
 
 	const handleMarkToDoAsDoneOrUndone = (todoId: string, isDone: boolean) => {
+		if (socket == null || !isRoomJoined) return;
+
 		socket.emit('mark-todo', todoId, isDone);
 
 		setTodos(

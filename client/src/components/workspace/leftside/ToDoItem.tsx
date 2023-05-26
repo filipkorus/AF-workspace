@@ -1,8 +1,8 @@
 import React from 'react';
 import theme from '../../../utils/theme';
-import {Box, IconButton, Link} from '@mui/material';
-import {IWorkspaceTODO} from '../../../types';
+import {Box, IconButton} from '@mui/material';
 import {Delete as DeleteIcon} from '@mui/icons-material';
+import IWorkspaceTODO from '../../../types/IWorkspaceTODO';
 
 const ToDoItem = ({todo, handleDelete, handleToggleIsDone}: {
 	todo: IWorkspaceTODO,
